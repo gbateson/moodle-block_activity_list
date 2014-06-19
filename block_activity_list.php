@@ -118,6 +118,9 @@ class block_activity_list extends block_base {
             $defaults['special'.$i] = ''; // 0=none, 1=grades, 2=participants, 4=calendar, 8=site page, 16=my moodle
         }
 
+        if (! isset($this->config)) {
+            $this->config = new stdClass();
+        }
         foreach ($defaults as $name => $value) {
             if (! isset($this->config->$name)) {
                 $this->config->$name = $value;
@@ -129,33 +132,35 @@ class block_activity_list extends block_base {
     }
 
     /**
-     * instance_config_save
+     * the method overrides the standard instance_config_save()
+     * it tries to apply selected settings to similar blocks
+     * in other courses in which this user can edit blocks
      *
-     * @param xxx $data
-     * @param xxx $pinned (optional, default=false)
+     * @param object $data contains the new config form data
+     * @param boolean $pinned (optional, default=false)
      * @return xxx
      */
     function instance_config_save($data, $pinned=false) {
-        global $CFG, $COURSE, $USER;
+        global $DB;
 
         // do nothing if user hit the "cancel" button
         if (optional_param('cancel', 0, PARAM_INT)) {
             return true;
         }
 
-        // expand "select_textlength", if required
-        if (isset($data->select_textlength)) {
-            $names = array('name', 'head', 'tail');
+        // expand "select_sectiontextlength", if required
+        if (isset($data->select_sectiontextlength)) {
+            $configs = array('name', 'head', 'tail');
 
-            $langs = get_list_of_languages();
+            $langs = $translations = get_string_manager()->get_list_of_translations();
             $langs = array_keys($langs);
             array_unshift($langs, '');
 
             foreach ($langs as $lang) {
                 $lang = substr($lang, 0, 2);
-                foreach ($names as $name) {
-                    $selectname = 'select_'.$name.'length'.$lang;
-                    $data->$selectname = $data->select_textlength;
+                foreach ($configs as $config) {
+                    $selectname = 'select_'.$config.'length'.$lang;
+                    $data->$selectname = $data->select_sectiontextlength;
                 }
             }
             unset($data->select_textlength);
@@ -228,178 +233,54 @@ class block_activity_list extends block_base {
         }
 
         $selected = array();
-        $courseids = array();
+        $contextids = array();
 
-        $data = (array)$data;
-        $names = array_keys($data);
-        foreach ($names as $name) {
-
-            if (substr($name, 0, 7)=='select_') {
-                continue;
-            }
+        $vars = get_object_vars($data);
+        foreach ($vars as $name => $value) {
 
             $selectname = 'select_'.$name;
-            if (empty($data[$selectname])) {
-                $data[$selectname] = 0;
+            if (empty($data->$selectname)) {
+                $data->$selectname = 0;
             }
 
-            if ($name=='mycourses') {
-                $courseids = $data[$name];
-            } else if ($data[$selectname]) {
-                $selected[$name] = stripslashes_recursive($data[$name]);
+            if ($name=='mycontextids') {
+                $contextids = $value;
+            } else if ($data->$selectname) {
+                $selected[$name] = stripslashes_recursive($value);
             }
 
             // remove "select_" field
-            unset($data[$selectname]);
+            unset($data->$selectname);
         }
-
-        $modinfo = get_fast_modinfo($COURSE, $USER->id);
+        unset($vars, $name, $value);
 
         // get ids of courses (excluding this one) in which user can edit blocks
-        $courses = $this->get_my_other_courses($courseids);
+        if ($contextids = implode(',', $contextids)) {
 
-        if ($ids = implode(',', array_keys($courses))) {
+            // get TaskChain navigation blocks in selected courses
+            $select = "blockname = ? AND pagetypepattern = ? AND parentcontextid IN ($contextids)";
+            $params = arary($this->instance->blockname, 'course-view-*');
+            if ($instances = $DB->get_records_select('block_instances', $select, $params)) {
 
-            // get QuizPort navigation blocks in selected courses
-            $select = "blockid={$this->instance->blockid} AND pagetype='course-view' AND pageid IN ($ids)";
-            if ($instances = get_records_select('block_instance', $select)) {
+                // user requires this capbility to update blocks
+                $capability = 'block/taskchain_navigation:addinstance';
 
                 // update values in the selected block instances
                 foreach ($instances as $instance) {
-                    $instance->config = unserialize(base64_decode($instance->configdata));
-                    foreach ($selected as $name => $value) {
-
-                        // special processing for $cmids of cmids
-                        // we want to search for the equivalent cm in the target course
-                        // (same course section, same activity type, same activity name)
-                        if (preg_match('/^list[0-9]+/', $name) && $value) {
-
-                            $value = explode(',', $value);
-                            foreach ($value as $v => $cmid) {
-
-                                if (empty($modinfo->cms[$cmid])) {
-                                    $new_cmid = 0; // shouldn't happen
-                                } else {
-                                    $select = 'cm2.id';
-                                    $from   = $CFG->prefix.'course_modules cm1,'.
-                                              $CFG->prefix.'course_sections s1,'.
-                                              $CFG->prefix.$modinfo->cms[$cmid]->modname.' x1,'.
-                                              $CFG->prefix.$modinfo->cms[$cmid]->modname.' x2,'.
-                                              $CFG->prefix.'course_modules cm2,'.
-                                              $CFG->prefix.'course_sections s2';
-                                    $where  = 'cm1.id = '.$modinfo->cms[$cmid]->id.
-                                              ' AND cm1.section = s1.id'.
-                                              ' AND x1.id = cm1.instance'.
-                                              ' AND x1.name = x2.name'.
-                                              ' AND x2.course = '.$instance->pageid. // target course id
-                                              ' AND x2.id = cm2.instance'.
-                                              ' AND cm2.module = cm1.module'.
-                                              ' AND cm2.section = s2.id'.
-                                              ' AND s2.section = s1.section'; // $modinfo->cms[$cmid]->sectionnum
-                                    $new_cmid = get_field_sql("SELECT $select FROM $from WHERE $where");
-                                }
-                                $value[$v] = $new_cmid;
-                            } // end foreach $value
-
-                            $value = array_filter($value); // remove blanks
-                            $value = implode(',', $value); // convert to string
-
-                        } // end if
-                        $instance->config->$name = $value;
+                    if (has_capability($capability, $instance->parentcontextid)) {
+                        $instance->config = unserialize(base64_decode($instance->configdata));
+                        foreach ($selected as $name => $value) {
+                            $instance->config->$name = $value;
+                        }
+                        $instance->configdata = base64_encode(serialize($instance->config));
+                        set_field('block_instances', 'configdata', $instance->configdata, 'id', $instance->id);
                     }
-                    $instance->configdata = base64_encode(serialize($instance->config));
-                    set_field('block_instance', 'configdata', $instance->configdata, 'id', $instance->id);
-                } // end foreach $instance
+                }
             }
         }
 
         //  save config settings as usual
-        $data = (object)$data;
         return parent::instance_config_save($data, $pinned);
-    }
-
-    /**
-     * get_my_other_courses
-     *
-     * @return xxx
-     */
-    function get_my_other_courses($courseids=null) {
-        global $CFG, $USER;
-
-        $my_other_courses = array();
-        $capability = 'moodle/site:manageblocks';
-
-        if (function_exists('get_user_access_sitewide')) {
-            // Moodle >= 1.8 : get access info for this user
-            if (isset($USER->access)) {
-                $access = $USER->access;
-            } else {
-                $access = get_user_access_sitewide($USER->id);
-            }
-            $courses = get_user_courses_bycap($USER->id, $capability, $access, true);
-        } else if (function_exists('get_user_capability_course')) {
-            // Moodle 1.7
-            if ($courses = get_user_capability_course($capability, $USER->id)) {
-                $ids = array();
-                foreach ($courses as $course) {
-                    if (is_null($courseids) || in_array($course->id, $courseids)) {
-                        $ids[$course->id] = true;
-                    }
-                }
-                $ids = implode(',', array_keys($ids));
-                $courses = get_records_select('course', "id IN ($ids)", 'sortorder', 'id,shortname');
-            }
-        } else {
-            // Moodle <= 1.6
-            $select = 'c.id,c.shortname';
-            $from   = "{$CFG->prefix}user_teachers ut, {$CFG->prefix}course c";
-            $where  = "ut.userid=$USER->id AND ut.course=c.id";
-            if ($courseids) {
-                switch (count($courseids)) {
-                    case 0: $where .= ' AND c.id<0'; break;
-                    case 1: $where .= ' AND c.id='.$courseids[0]; break;
-                    default: $where .= ' AND c.id IN ('.implode(',', $courseids).')';
-                }
-            }
-            $courses = get_records_sql("SELECT $select FROM $from WHERE $where");
-        }
-
-        if ($courses) {
-            foreach ($courses as $course) {
-                if (is_null($courseids) || in_array($course->id, $courseids)) {
-                    $my_other_courses[$course->id] = $course->shortname;
-                }
-            }
-        }
-
-        // remove the current course
-        unset($my_other_courses[$this->instance->pageid]);
-
-        // only allow courses that have a QuizPort navigation block
-        if (is_null($courseids)) {
-            $pageids = array();
-            if ($ids = implode(',', array_keys($my_other_courses))) {
-
-                // get QuizPort navigation blocks in selected courses
-                $select = "blockid={$this->instance->blockid} AND pagetype='course-view' AND pageid IN ($ids)";
-                if ($instances = get_records_select('block_instance', $select, '', 'id,pageid')) {
-
-                    // get this pageid (= a course id)
-                    foreach ($instances as $instance) {
-                        $pageids[] = $instance->pageid;
-                    }
-                }
-            }
-
-            $ids = array_keys($my_other_courses);
-            foreach ($ids as $id) {
-                if (! in_array($id, $pageids)) {
-                    unset($my_other_courses[$id]);
-                }
-            }
-        }
-
-        return $my_other_courses;
     }
 
     /**
@@ -408,7 +289,7 @@ class block_activity_list extends block_base {
      * @return xxx
      */
     function get_content() {
-        global $CFG, $COURSE, $USER;
+        global $CFG, $COURSE, $DB, $PAGE, $USER;
 
         if ($this->content !== null) {
             return $this->content;
@@ -419,20 +300,16 @@ class block_activity_list extends block_base {
             'footer' => ''
         );
 
-        // get the current context
-        if (empty($this->instance->pageid)) {
-            $context = self::context(CONTEXT_COURSE, SITEID);
-            $course = get_site();
-        } else {
-            $context = self::context(CONTEXT_COURSE, $this->instance->pageid);
-            if (isset($COURSE->id) && $COURSE->id == $this->instance->pageid) {
-                $course = $COURSE;
-            } else {
-                $course = get_record('course', 'id', $this->instance->pageid);
-            }
+        if (empty($this->instance)) {
+            return $this->content; // shouldn't happen !!
         }
 
-        $modinfo = get_fast_modinfo($course, $USER->id);
+        if (empty($COURSE)) {
+            return $this->content; // shouldn't happen !!
+        }
+
+        // get modinfo (used to find out which section each mod is in)
+        $modinfo = get_fast_modinfo($COURSE, $USER->id);
 
         $lists = array();
         for ($i=0; $i<$this->config->listcount; $i++) {
@@ -546,7 +423,7 @@ class block_activity_list extends block_base {
                             'originalname' => $originalname,
                             'displayname'  => $displayname,
                             'href'         => $href,
-                            'icon'         => $CFG->modpixpath.'/'.$cm->modname.'/icon.gif'
+                            'icon'         => $PAGE->theme->pix_url('icon', $cm->modname)->out()
                         );
                     }
                 }
@@ -746,12 +623,11 @@ class block_activity_list extends block_base {
             list($namelength, $headlength, $taillength) = $this->get_namelength();
         }
 
-        $textlib = textlib_get_instance();
-        $strlen = $textlib->strlen($name);
+        $strlen = self::textlib('strlen', $name);
 
         if ($strlen > $namelength) {
-            $head = $textlib->substr($name, 0, $headlength);
-            $tail = $textlib->substr($name, $strlen - $taillength, $taillength);
+            $head = self::textlib('substr', $name, 0, $headlength);
+            $tail = self::textlib('substr', $name, $strlen - $taillength, $taillength);
             $name = $head.' ... '.$tail;
         }
 
@@ -825,6 +701,7 @@ class block_activity_list extends block_base {
     }
 
     function fix_params(&$cm, $params) {
+        global $DB;
 
         // sanitize the params
         $params = stripslashes(urldecode($params));
@@ -852,8 +729,12 @@ class block_activity_list extends block_base {
                     if (is_numeric($match[1][0])) {
                         // do nothing - this is already an id (hope it is valid !)
                     } else {
-                        $select = 'glossaryid='.$cm->instance.' AND name REGEXP '."'".addslashes($match[1][0])."'";
-                        if ($id = get_field_select('glossary_categories', 'id', $select)) {
+                        $sqlselect = 'glossaryid = ? AND name REGEXP ?';
+                        $sqlparams = array($cm->instance, $match[1][0]);
+                        if ($id = $DB->get_records_select('glossary_categories', $sqlselect, $sqlparams)) {
+                            uasort($id, array($this, 'usort_by_namelength'));
+                            $id = reset($id);
+                            $id = $id->id;
                             // insert id of this glossary category
                             list($match, $start) = $match[1];
                             $params = substr_replace($params, $id, $start, strlen($match));
@@ -880,6 +761,25 @@ class block_activity_list extends block_base {
         }
 
         return str_replace('&', '&amp;', '&'.$params);
+    }
+
+    /**
+     * usort_by_namelength
+     *
+     * @param object $a
+     * @param object $b
+     * @return integer
+     */
+    public function usort_by_namelength($a, $b) {
+        $a_len = self::textlib('strlen', $a->name);
+        $b_len = self::textlib('strlen', $b->name);
+        if ($a_len < $b_len) {
+            return -1;
+        }
+        if ($a_len > $b_len) {
+            return 1;
+        }
+        return 0;
     }
 
     /**
@@ -961,43 +861,6 @@ class block_activity_list extends block_base {
             return $DB->get_field('course_format_options', 'value', $params);
         }
         return 0; // shouldn't happen !!
-    }
-
-    /**
-     * get_userfields
-     *
-     * @param string $tableprefix name of database table prefix in query
-     * @param array  $extrafields extra fields to be included in result (do not include TEXT columns because it would break SELECT DISTINCT in MSSQL and ORACLE)
-     * @param string $idalias     alias of id field
-     * @param string $fieldprefix prefix to add to all columns in their aliases, does not apply to 'id'
-     * @return string
-     */
-     static public function get_userfields($tableprefix='', array $extrafields=null, $idalias='id', $fieldprefix='') {
-        if (class_exists('user_picture')) {
-            // Moodle >= 2.6
-            return user_picture::fields($tableprefix, $extrafields, $idalias, $fieldprefix);
-        } else {
-            // Moodle <= 2.5
-            $fields = array('id', 'firstname', 'lastname', 'picture', 'imagealt', 'email');
-            if ($tableprefix || $extrafields || $idalias) {
-                if ($tableprefix) {
-                    $tableprefix .= '.';
-                }
-                if ($extrafields) {
-                    $fields = array_unique(array_merge($fields, $extrafields));
-                }
-                if ($idalias) {
-                    $idalias = " AS $idalias";
-                }
-                if ($fieldprefix) {
-                    $fieldprefix = " AS $fieldprefix";
-                }
-                foreach ($fields as $i => $field) {
-                    $fields[$i] = "$tableprefix$field".($field=='id' ? $idalias : ($fieldprefix=='' ? '' : "$fieldprefix$field"));
-                }
-            }
-            return implode(',', $fields); // 'u.id AS userid, u.username, u.firstname, u.lastname, u.picture, u.imagealt, u.email';
-        }
     }
 
     /**
