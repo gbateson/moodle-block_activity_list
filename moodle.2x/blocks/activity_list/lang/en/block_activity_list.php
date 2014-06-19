@@ -48,13 +48,13 @@ Any text in the activity name that matches the **search** string will be replace
 * You can specify the number of matches to be replaced using the **limit** setting.
 
 Note that the search and replace strings are PHP regular expressions so you can use
-<a href="http://www.php.net/manual/en/regexp.reference.meta.php">meta-characters</a>,
-<a href="http://www.php.net/manual/en/regexp.reference.escape.php">escape sequences</a>,
-<a href="http://www.php.net/manual/en/regexp.reference.anchors.php">anchors</a>,
-<a href="http://www.php.net/manual/en/regexp.reference.subpatterns.php">subpatterns</a>,
-<a href="http://www.php.net/manual/en/regexp.reference.repetition.php">repitition</a>,
-<a href="http://www.php.net/manual/en/regexp.reference.back-references.php">back references</a>,
-<a href="http://www.php.net/manual/en/regexp.reference.assertions.php">assertions</a>
+[meta-characters](http://www.php.net/manual/en/regexp.reference.meta.php),
+[escape sequences](http://www.php.net/manual/en/regexp.reference.escape.php),
+[anchors](http://www.php.net/manual/en/regexp.reference.anchors.php),
+[subpatterns](http://www.php.net/manual/en/regexp.reference.subpatterns.php),
+[repitition](http://www.php.net/manual/en/regexp.reference.repetition.php),
+[back references](http://www.php.net/manual/en/regexp.reference.back-references.php),
+[assertions](http://www.php.net/manual/en/regexp.reference.assertions.php)
 and so on.';
 $string['namefilter'] = 'Activity name filter';
 $string['namefilter_help'] = 'These settings allow you to include or exclude activities depending on their name.
