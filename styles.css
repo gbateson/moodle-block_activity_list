@@ -1,0 +1,183 @@
+/**
+ * blocks/activity_list/styles.css
+ *
+ * @package    blocks
+ * @subpackage activity_list
+ * @copyright  2014 Gordon Bateson <gordon.bateson@gmail.com>
+ * @license    you may not copy of distribute any part of this package without prior written permission
+ */
+
+table.blockconfigtable th.blockconfigmenu {
+    text-align: left;
+    background-color: #eeeeee;
+}
+
+table.blockconfigtable th.blockconfigmenu p {
+    float: left;
+    margin: 0px;
+    padding: 0px;
+}
+
+table.blockconfigtable th.blockconfigmenu ul {
+    float: left;
+    margin: 0px;
+    padding: 0px;
+    padding-left: 12px;
+    list-style-type: none;
+    font-size: x-small;
+    font-weight: normal;
+    width: 128px;
+}
+
+table.blockconfigtable th.blockconfigmenu ul li {
+    margin: 0px;
+    padding: 2px 4px;
+}
+
+table.blockconfigtable th.blockconfigmenu ul li.odd {
+    background-color: #e6e6e6;
+}
+
+table.blockconfigtable th.blockconfigmenu ul li.even {
+    background-color: #d6d6d6;
+}
+
+table.blockconfigtable th.blockconfigmenu ul li a {
+    display: block;
+}
+
+table.blockconfigtable th.blockconfigmenu ul li a:hover {
+    background-color: #eedddd;
+    text-decoration: none;
+}
+
+table.blockconfigtable td.importexport {
+    text-align: center;
+    font-size: 0.8em;
+}
+
+table.blockconfigtable tr {
+    vertical-align: top;
+}
+
+table.blockconfigtable td.blockdescription {
+    font-style: italic;
+    text-align: center;
+}
+
+table.blockconfigtable tr.sectionheading {
+    background-color: #eeeeee;
+    color: #000000;
+}
+
+table.blockconfigtable tr.sectionheading th {
+    text-align: left;
+}
+
+table.blockconfigtable td.blockdescription a:hover,
+table.blockconfigtable tr.sectionheading th a:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+table.blockconfigtable tr.sectionheading td {
+    text-align: center;
+    vertical-align: center;
+}
+
+table.blockconfigtable tr.sectionheading td input.submitbutton {
+    border: 1px solid #bbbbbb;
+    background-color: #dddddd;
+
+    margin-top: 1px;
+    font-size: 0.8em;
+
+    /* for Safari and Chrome */
+    -webkit-border-radius: 4px;
+
+    /* for Firefox */
+    -moz-border-radius: 4px;
+
+    /* when Opera Presto 2.3 or later is released */
+    -o-border-radius: 4px;
+
+    /* future proofing for when border-radius is supported in CSS3 */
+    border-radius: 4px;
+}
+
+table.blockconfigtable td.itemname {
+    text-align: right;
+}
+
+table.blockconfigtable td.itemvalue {
+    text-align: left;
+}
+
+table.blockconfigtable td.itemselect {
+    text-align: center;
+    font-size: 0.8em;
+    background-color: #eedddd;
+}
+
+table.blockconfigtable td.itemvalue select.modfilter {
+    width: 190px;
+}
+table.blockconfigtable td.itemvalue select.sortmethod {
+    width: 260px;
+}
+table.blockconfigtable td.itemvalue input.linkparams {
+    width: 256px;
+}
+
+table.blockconfigtable td.itemvalue span.radiogroup span.radioelement {
+    float: left;
+    clear: left;
+}
+
+table.blockconfigtable td.itemvalue div.subitem {
+	margin-bottom: 6px;
+}
+
+table.blockconfigtable td.itemvalue div.subitem div.subname {
+	width: 66px;
+	/* cross-browser inline-block */
+	display: -moz-inline-stack;
+	display: inline-block;
+	zoom: 1;
+	*display:inline;
+}
+
+table.blockconfigtable td.itemvalue div.subitem input {
+	margin-right: 6px;
+}
+
+/*
+ * styles for the activity_list block
+ */
+
+div.block_activity_list h3.title {
+    font-size: 0.9em;
+    margin: 2px;
+    padding: 0px 2px;
+}
+div.block_activity_list p.text,
+div.block_activity_list p.separator {
+    margin: 2px 0px;
+    padding: 0px 2px;
+}
+div.block_activity_list ul {
+    margin: 2px 0px;
+    padding: 0px;
+    list-style-type: none;
+}
+div.block_activity_list ul li {
+    margin: 2px 0px;
+    padding: 0px 4px;
+}
+div.block_activity_list ul li img.icon {
+    border: 0px none;
+    height: 16px;
+    width: 16px;
+    padding-bottom: 2px
+    vertical-align: middle;
+}

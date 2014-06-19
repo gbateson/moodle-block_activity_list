@@ -1,0 +1,549 @@
+<?php
+/**
+ * blocks/activity_list/config_instance.html
+ *
+ * @package   block_activity_list
+ * @copyright 2011 Gordon Bateson <gordon.bateson@gmail.com>
+ * @license   you may not copy of distribute any part of this package without prior written permission
+ */
+
+$my_other_courses = $this->get_my_other_courses();
+$savebutton = '<input type="submit" class="savebutton" value="'.get_string('save', 'block_activity_list').'" />';
+?>
+<script type="text/javascript">
+//<![CDATA[
+<?php if (empty($my_other_courses)) { ?>
+function hide_itemselect() {
+    var txt = 'td.itemselect { visibility: hidden; }';
+    var obj = document.createElement('style');
+    obj.setAttribute('type', 'text/css');
+    if (obj.styleSheet) {
+        obj.styleSheet.cssText = txt;
+    } else {
+        obj.appendChild(document.createTextNode(txt));
+    }
+    document.getElementsByTagName('head')[0].appendChild(obj);
+}
+hide_itemselect();
+<?php } ?>
+function reset_all_in(elTagName, elNamePrefix, parentTagName, parentClass, parentId, resetValues) {
+    var obj = document.getElementsByTagName(elTagName);
+    obj = filterByParent(obj, function(el) {return findParentNode(el, parentTagName, parentClass, parentId);});
+    for (var i=0; i<obj.length; i++) {
+        var elName = obj[i].name;
+        if (elName && (elNamePrefix=='' || elName.substr(0, elNamePrefix.length)==elNamePrefix)) {
+            switch (obj[i].type) {
+                case 'checkbox':
+                case 'radio':
+                    if (typeof(resetValues)=='string') {
+                        obj[i].checked = (resetValues=='all' ? true : false);
+                    } else {
+                        obj[i].checked = (resetValues[elName] ? true : false);
+                    }
+                    break;
+                case 'select':
+                case 'select-multiple':
+                    for (var ii=0; ii<obj[i].options.length; ii++) {
+                        if (typeof(resetValues)=='string') {
+                            obj[i].options[ii].selected = (resetValues=='all' ? true : false);
+                        } else {
+                            var elValue = obj[i].options[ii].value;
+                            obj[i].options[ii].selected = (resetValues[elValue] ? true : false);
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+}
+function toggledateformat(img, i) {
+    var obj = document.getElementById('dateformat' + i);
+    if (obj) {
+        if (obj.style.display=='none') {
+            obj.style.display = "";
+            img.src = "../pix/t/switch_minus.gif";
+        } else {
+            obj.style.display = "none";
+            img.src = "../pix/t/switch_plus.gif";
+        }
+    }
+    return false;
+}
+function select_all_courses(truefalse) {
+    var obj = document.getElementById('menumycourses');
+    if (obj) {
+        var i_max = obj.options.length;
+        for (var i=0; i<i_max; i++) {
+            obj.options[i].selected = truefalse;
+        }
+    }
+    return false;
+}
+function showhide_menu(obj) {
+    if (typeof(obj)=='undefined') {
+        obj = document.getElementById('showhidemenu');
+    }
+    if (obj && obj.parentNode && obj.parentNode.parentNode) {
+        var ul = obj.parentNode.parentNode.getElementsByTagName('ul');
+        var hidden = true;
+        for (var i=0; i<ul.length; i++) {
+            if (ul[i].style.display=='none') {
+                ul[i].style.display = '';
+                obj.innerHTML = '<img src="../pix/t/switch_minus.gif" alt="switch_minus.gif" />';
+                hidden = false;
+            } else {
+                ul[i].style.display = 'none';
+                obj.innerHTML = '<img src="../pix/t/switch_plus.gif" alt="switch_plus.gif" />';
+                hidden = true;
+            }
+        }
+        new cookie('quizportnavigationblock:showmenu', 1, (hidden ? -1 : 356), '/').set();
+    }
+}
+//]]>
+</script>
+<table cellpadding="9" cellspacing="0" class="blockconfigtable">
+
+<tr class="sectionheading">
+<th colspan="2" class="blockconfigmenu">
+    <p>
+        <?php print_string('settingsmenu', 'block_activity_list') ?>
+        &nbsp;
+        <a id="showhidemenu" onclick="showhide_menu(this)"><img src="../pix/t/switch_plus.gif" alt="switch_plus.gif" /></a>
+    </p>
+    <ul style="display: none;"><?php
+        for ($i=0; $i<$this->config->listcount; $i++) {
+            echo '<li class="even"><a href="#list'.($i+1).'">'.get_string('list', 'block_activity_list', ($i+1)).'</a></li>';
+        }
+    ?></ul>
+    <ul style="display: none;"><?php
+        if (count($my_other_courses)) {
+            echo '<li class="even"><a href="#applyselectedvalues">'.get_string('courses').'</a></li>';
+        }
+    ?></ul>
+</th>
+<td class="importexport"><?php
+    if (isset($this->instance)) {
+        echo '<a href="'.$CFG->wwwroot.'/blocks/activity_list/import.php?id='.$this->instance->id.'">'.get_string('importsettings', 'block_activity_list').'</a> ';
+        helpbutton('importsettings', get_string('importsettings', 'block_activity_list'), 'block_activity_list');
+        echo '<br />';
+        echo '<a href="'.$CFG->wwwroot.'/blocks/activity_list/export.php?id='.$this->instance->id.'">'.get_string('exportsettings', 'block_activity_list').'</a> ';
+        helpbutton('exportsettings', get_string('exportsettings', 'block_activity_list'), 'block_activity_list');
+    }
+?></td>
+</tr>
+
+<tr>
+<td colspan="2" class="blockdescription"><a name="title"><?php echo nl2br(get_string('blockdescription', 'block_activity_list')) ?></a></td>
+<td class="itemselect"><?php
+    echo get_string('select').' ';
+    helpbutton('selectallnone', get_string('select'), 'block_activity_list');
+    echo '<br />';
+    echo '<a href="'."javascript:reset_all_in('INPUT','select_','TD','itemselect',null,'all');".'">'.get_string('all').'</a>';
+    echo ' / ';
+    echo '<a href="'."javascript:reset_all_in('INPUT','select_','TD','itemselect',null,'none');".'">'.get_string('none').'</a>';
+?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('title', 'block_activity_list') ?>:<?php helpbutton('title', get_string('title', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><input type="text" name="title" size="30" value="<?php p($this->config->title) ?>" /></td>
+<td class="itemselect"><?php print_checkbox('select_title', 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('textlength', 'block_activity_list') ?>:<?php helpbutton('textlength', get_string('textlength', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><?php
+
+    // pick out mod names and languages used in this course
+    $modnames = array();
+    $langs = array('' => get_string('default'));
+
+    $modinfo = get_fast_modinfo($GLOBALS['COURSE'], $GLOBALS['USER']->id);
+
+    foreach ($modinfo->cms as $cmid => $cm) {
+        if ($cm->modname=='label') {
+            continue; // ignore labels
+        }
+        if (empty($modnames[$cm->modname])) {
+            $modnames[$cm->modname] = get_string('modulenameplural', $cm->modname);
+        }
+
+        // get language, if any
+        if (preg_match_all('/<span[^>]*class="multilang"[^>]*>/', $cm->name, $matches)) {
+            foreach ($matches[0] as $match) {
+                if (preg_match('/lang="(\w+)"/', $match, $lang)) {
+                    $lang = substr($lang[1], 0, 2);
+                    $langs[$lang] = '';
+                }
+            }
+        }
+    }
+
+    foreach (get_list_of_languages() as $lang => $text) {
+        $lang = substr($lang, 0, 2);
+        if (isset($langs[$lang])) {
+            $langs[$lang] = $text;
+        }
+    }
+
+    ksort($langs);
+    asort($modnames);
+
+    foreach ($langs as $lang => $text) {
+
+        $lang = substr($lang, 0, 2);
+        $namelength = 'namelength'.$lang;
+        $headlength = 'headlength'.$lang;
+        $taillength = 'taillength'.$lang;
+
+        if ($lang) {
+            echo '<br />';
+        }
+
+        echo '<small>'.get_string('total', 'block_activity_list').':</small> ';
+        echo '<input type="text" name="'.$namelength.'" size="2" value="'.(isset($this->config->$namelength) ? $this->config->$namelength : $this->config->namelength).'" />';
+        echo ' &nbsp; ';
+        echo '<small>'.get_string('head', 'block_activity_list').':</small> ';
+        echo '<input type="text" name="'.$headlength.'" size="2" value="'.(isset($this->config->$headlength) ? $this->config->$headlength : $this->config->headlength).'" />';
+        echo ' &nbsp; ';
+        echo '<small>'.get_string('tail', 'block_activity_list').':</small> ';
+        echo '<input type="text" name="'.$taillength.'" size="2" value="'.(isset($this->config->$taillength) ? $this->config->$taillength : $this->config->taillength).'" />';
+        echo ' &nbsp; ';
+        echo '<small>'.$text.'</small>';
+    }
+?></td>
+<td class="itemselect"><?php print_checkbox('select_textlength', 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('listcount', 'block_activity_list') ?>:<?php helpbutton('listcount', get_string('listcount', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><?php choose_from_menu(array_slice(range(0, 5), 1, 5, true), 'listcount', $this->config->listcount, get_string('none')) ?></td>
+<td class="itemselect"><?php print_checkbox('select_listcount', 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('separator', 'block_activity_list') ?>:<?php helpbutton('separator', get_string('separator', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><input type="text" name="separator" size="10" value="<?php p($this->config->separator) ?>" /></td>
+<td class="itemselect"><?php print_checkbox('select_separator', 1, false) ?></td>
+</tr>
+
+<?php
+    $courseformat = $GLOBALS['COURSE']->format;
+    $startdate = $GLOBALS['COURSE']->startdate;
+    switch ($courseformat) {
+        case 'weeks': $strsection = get_string('strftimedateshort'); break;
+        case 'topics': $strsection = get_string('topic'); break;
+        default: $strsection = get_string('section');
+    }
+
+    $sortoptions = array(
+        0 => get_string('sortsectionsequence', 'block_activity_list'),
+        1 => get_string('sortoriginalname', 'block_activity_list'),
+        2 => get_string('sortdisplayname', 'block_activity_list')
+    );
+
+    for ($i=0; $i<$this->config->listcount; $i++) {
+        $title   = 'title'.$i;
+        $text    = 'text'.$i;
+        $cmids   = 'cmids'.$i;
+        $index   = 'index'.$i;
+        $modname = 'modname'.$i;
+        $include = 'include'.$i;
+        $exclude = 'exclude'.$i;
+        $search  = 'search'.$i;
+        $case    = 'case'.$i;
+        $replace = 'replace'.$i;
+        $limit   = 'limit'.$i;
+        $sort    = 'sort'.$i;
+        $params  = 'params'.$i;
+        $special = 'special'.$i;
+
+        $namefilter = 'namefilter'.$i;
+        $namedisplay = 'namedisplay'.$i;
+
+        $index_array = explode(',', $this->config->$index);
+        $index_array = array_filter($index_array); // remove blanks
+?>
+<tr class="sectionheading"><th colspan="2"><a name="list<?php echo ($i+1) ?>"><?php print_string('list', 'block_activity_list', ($i+1))?></a></th><td><?php echo $savebutton ?></td></tr>
+
+<tr>
+<td class="itemname"><?php print_string('listtitle', 'block_activity_list') ?>:<?php helpbutton('listtitle', get_string('listtitle', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><input type="text" name="<?php echo $title ?>" size="24" value="<?php p($this->config->$title) ?>" /></td>
+<td class="itemselect"><?php print_checkbox('select_'.$title, 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('text', 'block_activity_list') ?>:<?php helpbutton('text', get_string('text', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><textarea name="<?php echo $text ?>" rows="6" cols="48"><?php p($this->config->$text) ?></textarea></td>
+<td class="itemselect"><?php print_checkbox('select_'.$text, 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('modfilter', 'block_activity_list') ?>:<?php helpbutton('modfilter', get_string('modfilter', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><?php choose_from_menu($modnames, $modname, $this->config->$modname, get_string('none'), '', '0', false, false, 0, '', false, false, 'modfilter') ?></td>
+<td class="itemselect"><?php print_checkbox('select_'.$modname, 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('namefilter', 'block_activity_list') ?>:<?php helpbutton('namefilter', get_string('namefilter', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue">
+    <div class="subitem">
+        <div class="subname"><?php print_string('include', 'block_activity_list') ?>:</div>
+        <input type="text" name="<?php echo $include ?>" size="15" value="<?php p($this->config->$include) ?>" />
+    </div>
+    <div class="subitem">
+        <div class="subname"><?php print_string('exclude', 'block_activity_list') ?>:</div>
+        <input type="text" name="<?php echo $exclude ?>" size="15" value="<?php p($this->config->$exclude) ?>" />
+    </div>
+</td>
+<td class="itemselect"><?php print_checkbox('select_'.$namefilter, 1, false) ?></td>
+</tr>
+
+<?php
+        $cmids_array = explode(',', $this->config->$cmids);
+        $cmids_array = array_filter($cmids_array); // remove blanks
+
+        $count = 0;
+        $reset = array();
+
+		$activitymenu = array();
+		foreach ($modinfo->cms as $cmid => $cm) {
+			if ($cm->modname=='label') {
+				continue; // ignore labels
+			}
+
+			// start new name for this course section
+			if ($cm->sectionnum==0) {
+				$name = get_string('introduction', 'quiz');
+			} else if ($courseformat=='weeks') {
+				$date = $startdate + 7200 + ($cm->sectionnum * 604800);
+				$name = userdate($date, $strsection).' - '.userdate($date + 518400, $strsection);
+			} else {
+				$name = $strsection.': '.$cm->sectionnum;
+			}
+			if (empty($activitymenu[$name])) {
+				$activitymenu[$name] = array();
+			}
+
+			if (in_array($cmid, $cmids_array)) {
+				$selected = ' selected="selected"';
+				$reset[] = $cmid;
+			} else {
+				$selected = '';
+			}
+			$count++;
+
+			if (empty($CFG->modpixpath)) {
+				$style= ''; // shouldn't happen
+			} else {
+				$url = $CFG->modpixpath.'/'.$cm->modname.'/icon.gif';
+				$style = ' style="background-image: url('.$url.'); background-repeat: no-repeat; background-position: 1px 2px; min-height: 20px;"';
+			}
+
+			$activitymenu[$name][] = '<option value="'.$cmid.'"'.$selected.$style.'>'.$this->trim_name($cm->name, 60).'</option>';
+		}
+		$size = min(8, count($modinfo->cms));
+
+		foreach ($activitymenu as $name => $options) {
+			$activitymenu[$name] = '<optgroup label="'.$name.'">'."\n".implode("\n", $options).'</optgroup>';
+		}
+		$activitymenu = implode("\n", $activitymenu);
+		$activitymenu = '<select id="menu_'.$cmids.'" name="'.$cmids.'[]" size="'.$size.'" multiple="multiple">'."\n".$activitymenu."\n".'</select>'."\n";
+?>
+<tr>
+<td class="itemname"><?php
+    print_string('cmids', 'block_activity_list');
+    echo ':';
+    helpbutton('cmids', get_string('cmids', 'block_activity_list'), 'block_activity_list');
+
+    if (empty($reset) || count($reset)==$count) {
+        $reset = '';
+    } else {
+        // convert $reset to a JSON associative array specification
+        $reset = '{'.implode(':true,', $reset).':true}';
+        $reset = '<a href="'."javascript:reset_all_in('SELECT','$cmids','','',null,$reset);".'">'.get_string('reset').'</a>';
+        $reset .= ' / ';
+    }
+
+    echo '<div class="smalltext">';
+    echo '<a href="'."javascript:reset_all_in('SELECT','$cmids','','',null,'all');".'">'.get_string('all').'</a>';
+    echo ' / ';
+    echo $reset;
+    echo '<a href="'."javascript:reset_all_in('SELECT','$cmids','','',null,'none');".'">'.get_string('none').'</a>';
+    echo '</div>';
+?></td>
+<td class="itemvalue"><?php echo $activitymenu; ?></td>
+<td class="itemselect"><?php print_checkbox('select_'.$cmids, 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('namedisplay', 'block_activity_list') ?>:<?php helpbutton('namedisplay', get_string('namedisplay', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue">
+    <div class="subitem">
+        <div class="subname"><?php print_string('search', 'block_activity_list') ?>:</div>
+        <input type="text" name="<?php echo $search ?>" size="15" value="<?php p($this->config->$search) ?>" />
+        <?php
+            $options = array(
+                0 => get_string('caseinsensitive', 'block_activity_list'),
+                1 => get_string('casesensitive', 'block_activity_list'),
+            );
+            choose_from_menu($options, $case, $this->config->$case, '');
+        ?>
+    </div>
+    <div class="subitem">
+        <div class="subname"><?php print_string('replace', 'block_activity_list') ?>:</div>
+        <input type="text" name="<?php echo $replace ?>" size="15" value="<?php p($this->config->$replace) ?>" />
+        <?php print_string('limit', 'block_activity_list') ?>:
+        <?php choose_from_menu(array_slice(range(0, 5), 1, 5, true), $limit, $this->config->$limit, get_string('none')) ?>
+    </div>
+</td>
+<td class="itemselect"><?php print_checkbox('select_'.$namedisplay, 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('sort', 'block_activity_list') ?>:<?php helpbutton('sort', get_string('sort', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><?php choose_from_menu($sortoptions, $sort, $this->config->$sort, '', '', '0', false, false, 0, '', false, false, 'sortmethod') ?></td>
+<td class="itemselect"><?php print_checkbox('select_'.$sort, 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php print_string('params', 'block_activity_list') ?>:<?php helpbutton('params', get_string('params', 'block_activity_list'), 'block_activity_list') ?></td>
+<td class="itemvalue"><input type="text" name="<?php echo $params ?>" size="24" value="<?php p($this->config->$params) ?>" class="linkparams" /></td>
+<td class="itemselect"><?php print_checkbox('select_'.$params, 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php
+    print_string('index', 'block_activity_list');
+    echo ':';
+    helpbutton('modindex', get_string('index', 'block_activity_list'), 'block_activity_list');
+
+    if (empty($modnames) || empty($index_array) || count($modnames)==count($index_array)) {
+        $reset = '';
+    } else {
+        // convert $index_array to a JSON object (= associative array)
+        $reset = '{'."'".$index.'['.implode(']'."':true,'".$index.'[', $index_array).']'."'".':true}';
+        $reset = '<a href="'."javascript:reset_all_in('INPUT','$index','DIV','indexlist',null,$reset);".'">'.get_string('reset').'</a>';
+        $reset .= ' / ';
+    }
+
+    echo '<div class="smalltext">';
+    echo '<a href="'."javascript:reset_all_in('INPUT','$index','DIV','indexlist',null,'all');".'">'.get_string('all').'</a>';
+    echo ' / ';
+    echo $reset;
+    echo '<a href="'."javascript:reset_all_in('INPUT','$index','DIV','indexlist',null,'none');".'">'.get_string('none').'</a>';
+    echo '</div>';
+?></td>
+<td class="itemvalue"><?php
+    echo '<div class="indexlist">';
+    foreach ($modnames as $value => $label) {
+        print_checkbox($index.'['.$value.']', 1, in_array($value, $index_array), $label);
+        echo '<br />';
+    }
+    echo '</div>';
+?></td>
+<td class="itemselect"><?php print_checkbox('select_'.$modname, 1, false) ?></td>
+</tr>
+
+<tr>
+<td class="itemname"><?php
+    print_string('special', 'block_activity_list');
+    echo ':';
+    helpbutton('special', get_string('special', 'block_activity_list'), 'block_activity_list');
+
+    if (empty($this->config->$special) || $this->config->$special==63) {
+        $reset = '';
+    } else {
+        $reset = array(
+            $this::SPECIAL_GRADES   => ($this->config->$special & $this::SPECIAL_GRADES   ? 1 : 0),
+            $this::SPECIAL_PARTICIPANTS => ($this->config->$special & $this::SPECIAL_PARTICIPANTS ? 1 : 0),
+            $this::SPECIAL_CALENDAR => ($this->config->$special & $this::SPECIAL_CALENDAR ? 1 : 0),
+            $this::SPECIAL_COURSES  => ($this->config->$special & $this::SPECIAL_COURSES  ? 1 : 0),
+            $this::SPECIAL_SITEPAGE => ($this->config->$special & $this::SPECIAL_SITEPAGE ? 1 : 0),
+            $this::SPECIAL_MYMOODLE => ($this->config->$special & $this::SPECIAL_MYMOODLE ? 1 : 0),
+        );
+        // convert $reset to a JSON associative array specification
+        $reset = '{'."'".$special.'['.implode(']'."':true,'".$special.'[', array_keys($reset, 1)).']'."'".':true}';
+        $reset = '<a href="'."javascript:reset_all_in('INPUT','$special','DIV','speciallist',null,$reset);".'">'.get_string('reset').'</a>';
+        $reset .= ' / ';
+    }
+
+    echo '<div class="smalltext">';
+    echo '<a href="'."javascript:reset_all_in('INPUT','$special','DIV','speciallist',null,'all');".'">'.get_string('all').'</a>';
+    echo ' / ';
+    echo $reset;
+    echo '<a href="'."javascript:reset_all_in('INPUT','$special','DIV','speciallist',null,'none');".'">'.get_string('none').'</a>';
+    echo '</div>';
+?></td>
+<td class="itemvalue"><?php
+    echo '<div class="speciallist">';
+
+    $checked = ($this->config->$special & $this::SPECIAL_GRADES);
+    print_checkbox($special.'['.$this::SPECIAL_GRADES.']', 1, $checked, get_string('grades'));
+    echo '<br />';
+
+    $checked = ($this->config->$special & $this::SPECIAL_PARTICIPANTS);
+    print_checkbox($special.'['.$this::SPECIAL_PARTICIPANTS.']', 1, $checked, get_string('participants'));
+    echo '<br />';
+
+    $checked = ($this->config->$special & $this::SPECIAL_CALENDAR);
+    print_checkbox($special.'['.$this::SPECIAL_CALENDAR.']', 1, $checked, get_string('calendar', 'calendar'));
+    echo '<br />';
+
+    $checked = ($this->config->$special & $this::SPECIAL_COURSES);
+    print_checkbox($special.'['.$this::SPECIAL_COURSES.']', 1, $checked, get_string('courses', 'admin'));
+    echo '<br />';
+
+    $checked = $this->config->$special & $this::SPECIAL_MYMOODLE;
+    print_checkbox($special.'['.$this::SPECIAL_MYMOODLE.']', 1, $checked, get_string('mymoodle', 'admin'));
+    echo '<br />';
+
+    $checked = ($this->config->$special & $this::SPECIAL_SITEPAGE);
+    print_checkbox($special.'['.$this::SPECIAL_SITEPAGE.']', 1, $checked, get_string('frontpage', 'admin'));
+
+    echo '</div>';
+?></td>
+<td class="itemselect"><?php print_checkbox('select_'.$modname, 1, false) ?></td>
+</tr>
+<?php
+    } // end loop for listcount
+?>
+
+<?php if ($count = count($my_other_courses)) { ?>
+<tr class="sectionheading"><th colspan="2"><a name="applyselectedvalues"><?php print_string('applyselectedvalues', 'block_activity_list')?></a></th><td><?php echo $savebutton ?></td></tr>
+
+<tr>
+<td class="itemname"><?php print_string('courses') ?>:<?php
+    helpbutton('mycourses', get_string('courses'), 'block_activity_list');
+    if ($count > 1) {
+        echo '<br /><small><a href="#" onclick="return select_all_courses(true)">'.get_string('all').'</a>';
+        echo ' / ';
+        echo '<a href="#" onclick="return select_all_courses(false)">'.get_string('none').'</a></small>';
+    }
+?></td>
+<td class="itemvalue" colspan="2"><?php
+    if ($count > 1) {
+        choose_from_menu($my_other_courses, 'mycourses[]', '', '', '', '0', false, false, 0, '', true, true);
+    } else {
+        choose_from_menu($my_other_courses, 'mycourses[]', '', ' ');
+    }
+?></td>
+</tr>
+<?php } else { ?>
+<tr class="sectionheading"><th colspan="2"></th><td><?php echo $savebutton ?></td></tr>
+<?php } ?>
+
+</table>
+
+<script type="text/javascript">
+//<![CDATA[
+if(new cookie('quizportnavigationblock:showmenu').read()) {
+    showhide_menu();
+}
+//]]>
+</script>
+<?php
+    // unset variables used in this file
+    unset($configs, $config, $fixdaymonth, $fmt, $forexample, $options, $option, $string, $time, $userdate);
+?>
