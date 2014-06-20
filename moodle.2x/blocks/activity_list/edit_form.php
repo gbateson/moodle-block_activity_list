@@ -72,543 +72,26 @@ class block_activity_list_edit_form extends block_edit_form {
         $mform->setDefault($config_name, $this->defaultvalue($name));
         $mform->addHelpButton($config_name, $name, $plugin);
 
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, 'grades', 'coursegradecategory');
-        //-----------------------------------------------------------------------------
-
-        $name = 'showcourse';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string('show'));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'coursenamefield';
-        $config_name = 'config_'.$name;
-        $options = array(
-            'fullname'  => get_string('fullname'),
-            'shortname' => get_string('shortname')
-        );
-        $mform->addElement('select', $config_name, get_string('name'), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        /* =========================================== *\
-        $name = 'coursegradeposition';
-        $config_name = 'config_'.$name;
-        $options = array(
-            '0' => get_string('positionfirst', 'grades'),
-            '1' => get_string('positionlast', 'grades')
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-        \* =========================================== */
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, 'grades', 'gradecategories');
-        //-----------------------------------------------------------------------------
-
-        $name = 'minimumdepth';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $depth_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'maximumdepth';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $depth_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'categoryskipempty';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'categoryskiphidden';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'categoryskipzeroweighted';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'categorycollapse';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('no'),
-            1 => get_string('usechildcategory', $plugin),
-            2 => get_string('useparentcategory', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'gradecategorynames');
-        //-----------------------------------------------------------------------------
-
-        $name = 'categoryshortnames';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'categoryshowweighting';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'categoryignorechars';
-        $config_name = 'config_'.$name;
-        $mform->addElement('text', $config_name, get_string($name, $plugin), array('size' => 10));
-        $mform->setType($config_name, PARAM_TEXT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'categoryprefixes');
-        //-----------------------------------------------------------------------------
-
-        $name = 'categoryprefixlength';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string('prefixlength', $plugin), $length_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'prefixlength', $plugin);
-
-        $name = 'categoryprefixchars';
-        $config_name = 'config_'.$name;
-        $mform->addElement('text', $config_name, get_string('prefixchars', $plugin), array('size' => 10));
-        $mform->setType($config_name, PARAM_TEXT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'prefixchars', $plugin);
-
-        $name = 'categoryprefixlong';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('short', $plugin),
-            1 => get_string('long', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string('prefixlong', $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'prefixlong', $plugin);
-
-        $name = 'categoryprefixkeep';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string('prefixkeep', $plugin), $keep_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'prefixkeep', $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'categorysuffixes');
-        //-----------------------------------------------------------------------------
-
-        $name = 'categorysuffixlength';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string('suffixlength', $plugin), $length_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'suffixlength', $plugin);
-
-        $name = 'categorysuffixchars';
-        $config_name = 'config_'.$name;
-        $mform->addElement('text', $config_name, get_string('suffixchars', $plugin), array('size' => 10));
-        $mform->setType($config_name, PARAM_TEXT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'suffixchars', $plugin);
-
-        $name = 'categorysuffixlong';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('short', $plugin),
-            1 => get_string('long', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string('suffixlong', $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'suffixlong', $plugin);
-
-        $name = 'categorysuffixkeep';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string('suffixkeep', $plugin), $keep_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'suffixkeep', $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'sections');
-        //-----------------------------------------------------------------------------
-
-        $name = 'sectionshowhidden';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('hide'),
-            1 => get_string('showwithlink', $plugin),
-            2 => get_string('showwithoutlink', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'sectionshowburied';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('hide'),
-            1 => get_string('promotetovisiblegradecategory', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'sectionshowungraded';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('hide'),
-            1 => get_string('ungradedshow1', $plugin),
-            2 => get_string('ungradedshow2', $plugin),
-            3 => get_string('ungradedshow3', $plugin),
-            4 => get_string('ungradedshow4', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        /* =========================================== *\
-        $name = 'sectionshowuncategorized';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('showabovemaingradecategories', $plugin),
-            1 => get_string('showbelowmaingradecategories', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-        \* =========================================== */
-
-        $name = 'sectionshowzeroweighted';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('hide'),
-            1 => get_string('show'),
-            2 => get_string('mergewithungradedsections', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'sectiontitles');
-        //-----------------------------------------------------------------------------
-
-        $name = 'sectiontitletags';
-        $config_name = 'config_'.$name;
-        $mform->addElement('text', $config_name, get_string('sectiontitletags', $plugin), array('size' => 10));
-        $mform->setType($config_name, PARAM_TEXT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'sectionshorttitles';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'sectionignorecase';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string('ignorecase', $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'ignorecase', $plugin);
-
-        $name = 'sectionignorechars';
-        $config_name = 'config_'.$name;
-        $mform->addElement('text', $config_name, get_string($name, $plugin), array('size' => 10));
-        $mform->setType($config_name, PARAM_TEXT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'sectionprefixes');
-        //-----------------------------------------------------------------------------
-
-        $name = 'sectionprefixlength';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string('prefixlength', $plugin), $length_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'prefixlength', $plugin);
-
-        $name = 'sectionprefixchars';
-        $config_name = 'config_'.$name;
-        $mform->addElement('text', $config_name, get_string('prefixchars', $plugin), array('size' => 10));
-        $mform->setType($config_name, PARAM_TEXT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'prefixchars', $plugin);
-
-        $name = 'sectionprefixlong';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('short', $plugin),
-            1 => get_string('long', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string('prefixlong', $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'prefixlong', $plugin);
-
-        $name = 'sectionprefixkeep';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string('prefixkeep', $plugin), $keep_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'prefixkeep', $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'sectionsuffixes');
-        //-----------------------------------------------------------------------------
-
-        $name = 'sectionsuffixlength';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string('suffixlength', $plugin), $length_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'suffixlength', $plugin);
-
-        $name = 'sectionsuffixchars';
-        $config_name = 'config_'.$name;
-        $mform->addElement('text', $config_name, get_string('suffixchars', $plugin), array('size' => 10));
-        $mform->setType($config_name, PARAM_TEXT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'suffixchars', $plugin);
-
-        $name = 'sectionsuffixlong';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('short', $plugin),
-            1 => get_string('long', $plugin)
-        );
-        $mform->addElement('select', $config_name, get_string('suffixlong', $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'suffixlong', $plugin);
-
-        $name = 'sectionsuffixkeep';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string('suffixkeep', $plugin), $keep_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, 'suffixkeep', $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, 'moodle', 'groups');
-        //-----------------------------------------------------------------------------
-
-        $name = 'groupsmenu';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'groupslabel';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'groupscountusers';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'loginasmenu';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'loginassort';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('fullname'),
-            1 => get_string('firstname'),
-            2 => get_string('lastname'),
-            3 => get_string('username'),
-            4 => get_string('idnumber')
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, 'moodle', 'grades');
-        //-----------------------------------------------------------------------------
-
-        /* =========================================== *\
-        $name = 'gradedisplay';
-        $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('displaypoints',      'grades'),
-            1 => get_string('displaypercent',     'grades'),
-            2 => get_string('displayweighted',    'grades'),
-            3 => get_string('displaylettergrade', 'grades')
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-        \* =========================================== */
-
-        $name = 'showaverages';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'highgrade';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $grade_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'mediumgrade';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $grade_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'lowgrade';
-        $config_name = 'config_'.$name;
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $grade_options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'coursesections');
-        //-----------------------------------------------------------------------------
-
-        $name = 'sectionjumpmenu';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'sectionnumbers';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'singlesection';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'defaultsection';
-        $config_name = 'config_'.$name;
-        $options = array_slice(range(0, $this->block->config->numsections), 1, $this->block->config->numsections, true);
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'coursepageshortcuts');
-        //-----------------------------------------------------------------------------
-
-        $name = 'accesscontrol';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'gradebooklink';
-        $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
-        $mform->setType($config_name, PARAM_INT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $this->add_field_hiddensections($mform, $plugin);
         $this->add_field_languages($mform, $plugin);
 
-        $name = 'currentsection';
+        $name = 'listcount';
         $config_name = 'config_'.$name;
-        $mform->addElement('selectyesno', $config_name, get_string($name, $plugin));
+        $options = array_slice(range(0, 5), 1, 5, true);
+        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
         $mform->setType($config_name, PARAM_INT);
         $mform->setDefault($config_name, $this->defaultvalue($name));
         $mform->addHelpButton($config_name, $name, $plugin);
 
-        //-----------------------------------------------------------------------------
-        $this->add_header($mform, $plugin, 'styles');
-        //-----------------------------------------------------------------------------
-
-        $name = 'moodlecss';
+        $name = 'separator';
         $config_name = 'config_'.$name;
-        $options = array(
-            0 => get_string('none'),
-            1 => get_string('simpleview', 'grades'),
-            2 => get_string('pluginname', 'gradereport_user')
-        );
-        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-        $mform->setType($config_name, PARAM_RAW);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
-
-        $name = 'externalcss';
-        $config_name = 'config_'.$name;
-        $mform->addElement('text', $config_name, get_string('externalcss', $plugin), array('size' => 50));
+        $mform->addElement('text', $config_name, get_string($name, $plugin), array('size' => 10));
         $mform->setType($config_name, PARAM_TEXT);
         $mform->setDefault($config_name, $this->defaultvalue($name));
         $mform->addHelpButton($config_name, $name, $plugin);
 
-        $name = 'internalcss';
-        $config_name = 'config_'.$name;
-        $params = array('wrap' => 'virtual', 'rows' => 6, 'cols' => 48);
-        $mform->addElement('textarea', $config_name, get_string($name, $plugin), $params);
-        $mform->setType($config_name, PARAM_TEXT);
-        $mform->setDefault($config_name, $this->defaultvalue($name));
-        $mform->addHelpButton($config_name, $name, $plugin);
+        //-----------------------------------------------------------------------------
+        $this->add_lists($mform, $plugin);
+        //-----------------------------------------------------------------------------
 
         if (isset($this->block->instance)) {
             if ($mycourses = $this->get_mycourses()) {
@@ -627,6 +110,110 @@ class block_activity_list_edit_form extends block_edit_form {
 
                 $this->add_importexport($mform, $plugin);
             }
+        }
+    }
+
+    /**
+     * add_lists
+     *
+     * @param object  $mform
+     * @param string  $plugin
+     * @return void, but will update $mform
+     */
+    protected function add_lists($mform, $plugin) {
+        global $COURSE, $DB, $USER;
+
+        $courseformat = $COURSE->format;
+        $startdate = $COURSE->startdate;
+        switch ($courseformat) {
+            case 'weeks': $strsection = get_string('strftimedateshort'); break;
+            case 'topics': $strsection = get_string('topic'); break;
+            default: $strsection = get_string('section');
+        }
+
+        $sortoptions = array(
+            0 => get_string('sortsectionsequence', $plugin),
+            1 => get_string('sortoriginalname', $plugin),
+            2 => get_string('sortdisplayname', $plugin)
+        );
+
+        $modnames = $this->get_modnames();
+
+        for ($i=0; $i<$this->block->config->listcount; $i++) {
+            $title   = 'title'.$i;
+            $text    = 'text'.$i;
+            $cmids   = 'cmids'.$i;
+            $index   = 'index'.$i;
+            $modname = 'modname'.$i;
+            $include = 'include'.$i;
+            $exclude = 'exclude'.$i;
+            $search  = 'search'.$i;
+            $case    = 'case'.$i;
+            $replace = 'replace'.$i;
+            $limit   = 'limit'.$i;
+            $sort    = 'sort'.$i;
+            $params  = 'params'.$i;
+            $special = 'special'.$i;
+
+            $namefilter = 'namefilter'.$i;
+            $namedisplay = 'namedisplay'.$i;
+
+            $index_array = explode(',', $this->block->config->$index);
+            $index_array = array_filter($index_array); // remove blanks
+
+            //-------------------------------------------------------------------------
+            $name = 'list';
+            $label = get_string('list', $plugin, ($i+1));
+            $mform->addElement('header', $name.$i, $label);
+            if (method_exists($mform, 'setExpanded')) {
+                $mform->setExpanded($name.$i, true);
+            }
+            //-------------------------------------------------------------------------
+
+            $name = 'listtitle';
+            $config_name = 'config_'.$name.$i;
+            $mform->addElement('text', $config_name, get_string($name, $plugin), array('size' => 24));
+            $mform->setType($config_name, PARAM_TEXT);
+            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+            $mform->addHelpButton($config_name, $name, $plugin);
+
+            $name = 'text';
+            $config_name = 'config_'.$name.$i;
+            $params = array('wrap' => 'virtual', 'rows' => 6, 'cols' => 48);
+            $mform->addElement('textarea', $config_name, get_string($name, $plugin), $params);
+            $mform->setType($config_name, PARAM_TEXT);
+            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+            $mform->addHelpButton($config_name, $name, $plugin);
+
+            $name = 'modfilter';
+            $config_name = 'config_'.$name.$i;
+            $mform->addElement('select', $config_name, get_string($name, $plugin), $modnames);
+            $mform->setType($config_name, PARAM_PLUGIN);
+            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+            $mform->addHelpButton($config_name, $name, $plugin);
+
+            $this->add_field_namefilter($mform, $plugin, $i);
+            $this->add_field_cmids($mform, $plugin, $i);
+            $this->add_field_namedisplay($mform, $plugin, $i);
+
+            $name = 'sort';
+            $config_name = 'config_'.$name.$i;
+            $options = array(
+                0 => get_string('sortsectionsequence', $plugin),
+                1 => get_string('sortoriginalname', $plugin),
+                2 => get_string('sortdisplayname', $plugin)
+            );
+            $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
+            $mform->setType($config_name, PARAM_INT);
+            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+            $mform->addHelpButton($config_name, $name, $plugin);
+
+            $name = 'params';
+            $config_name = 'config_'.$name.$i;
+            $mform->addElement('text', $config_name, get_string($name, $plugin), array('size' => 24));
+            $mform->setType($config_name, PARAM_TEXT);
+            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+            $mform->addHelpButton($config_name, $name, $plugin);
         }
     }
 
@@ -682,17 +269,26 @@ class block_activity_list_edit_form extends block_edit_form {
      * @return void, but will update $mform
      */
     protected function add_field_languages($mform, $plugin) {
-        global $COURSE, $DB;
+        global $COURSE, $DB, $USER;
 
         $langs = array('' => get_string('default'));
-        if ($sections = $DB->get_records('course_sections', array('course' => $COURSE->id), '', 'id,summary')) {
-            foreach ($sections as $section) {
-                if (preg_match_all('/<span[^>]*class="multilang"[^>]*>/', $section->summary, $matches)) {
-                    foreach ($matches[0] as $match) {
-                        if (preg_match('/lang="(\w+)"/', $match, $lang)) {
-                            $lang = substr($lang[1], 0, 2);
-                            $langs[$lang] = '';
-                        }
+
+        // pick out mod names and languages used in this course
+        $modinfo = get_fast_modinfo($COURSE, $USER->id);
+        foreach ($modinfo->cms as $cmid => $cm) {
+            if ($cm->modname=='label') {
+                continue; // ignore labels
+            }
+            if (empty($modnames[$cm->modname])) {
+                $modnames[$cm->modname] = get_string('modulenameplural', $cm->modname);
+            }
+
+            // get language, if any
+            if (preg_match_all('/<span[^>]*class="multilang"[^>]*>/', $cm->name, $matches)) {
+                foreach ($matches[0] as $match) {
+                    if (preg_match('/lang="(\w+)"/', $match, $lang)) {
+                        $lang = substr($lang[1], 0, 2);
+                        $langs[$lang] = '';
                     }
                 }
             }
@@ -710,6 +306,7 @@ class block_activity_list_edit_form extends block_edit_form {
 
         // remove languages that are not available on this site
         $langs = array_filter($langs);
+        ksort($langs);
 
         // cache some useful strings and textbox params
         $total = html_writer::tag('small', get_string('total', $plugin).': ');
@@ -740,7 +337,7 @@ class block_activity_list_edit_form extends block_edit_form {
             $elements[] = $mform->createElement('static', '', '', html_writer::tag('small', $text));
         }
 
-        $name = 'sectiontextlength';
+        $name = 'textlength';
         $mform->addGroup($elements, $name, get_string($name, $plugin), ' ', false);
         $mform->addHelpButton($name, $name, $plugin);
 
@@ -748,6 +345,178 @@ class block_activity_list_edit_form extends block_edit_form {
             if ($element->getType()=='text') {
                 $mform->setType($element->getName(), PARAM_INT);
             }
+        }
+    }
+
+    /**
+     * get_modnames
+     *
+     * @return array of modnames used in this course
+     */
+    protected function get_modnames() {
+        global $COURSE, $USER;
+        $modnames = array();
+
+        // pick out mod names
+        $modinfo = get_fast_modinfo($COURSE, $USER->id);
+        foreach ($modinfo->cms as $cmid => $cm) {
+            if ($cm->modname=='label') {
+                continue; // ignore labels
+            }
+            if (empty($modnames[$cm->modname])) {
+                $modnames[$cm->modname] = get_string('modulenameplural', $cm->modname);
+            }
+        }
+
+        asort($modnames);
+        return array('' => get_string('none')) + $modnames;
+    }
+
+    /**
+     * add_field_namefilter
+     *
+     * @param object $mform
+     * @param string $plugin
+     * @param integer $i
+     * @return void, but will modify $mform
+     */
+    protected function add_field_namefilter($mform, $plugin, $i) {
+        $elements = array();
+
+        $names = array('include', 'exclude');
+        foreach ($names as $name) {
+            $config_name = 'config_'.$name.$i;
+            $elements[] = $mform->createElement('static', '', '', get_string($name, $plugin));
+            $elements[] = $mform->createElement('text', $config_name, '', array('size' => 15));
+            $elements[] = $mform->createElement('static', '', '', html_writer::empty_tag('br'));
+        }
+        array_pop($elements); // remove last <br />
+
+        $name = 'namefilter';
+        $elements_name = 'elements_'.$name.$i;
+        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), ' ', false);
+        $mform->addHelpButton($elements_name, $name, $plugin);
+
+        foreach ($names as $name) {
+            $config_name = 'config_'.$name.$i;
+            $mform->setType($config_name, PARAM_TEXT);
+            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+        }
+    }
+
+    /**
+     * add_field_cmids
+     *
+     * @param object $mform
+     * @param string $plugin
+     * @param integer $i
+     * @return void, but will modify $mform
+     */
+    protected function add_field_cmids($mform, $plugin, $i) {
+        global $COURSE;
+
+        if (! $modinfo = get_fast_modinfo($COURSE)) {
+            return false; // shouldn't happen !!
+        }
+
+        // set course section descriptor
+        switch ($COURSE->format) {
+            case 'weeks': $strsection = get_string('strftimedateshort'); break;
+            case 'topics': $strsection = get_string('topic'); break;
+            default: $strsection = get_string('section');
+        }
+
+        $count = 0;
+
+        // create activity list
+        $sectionnum = -1;
+        foreach ($modinfo->cms as $cmid=>$mod) {
+            if ($mod->modname=='label') {
+                continue; // ignore labels
+            }
+            if ($sectionnum==$mod->sectionnum) {
+                // do nothing (same section)
+            } else {
+                // start new optgroup for this course section
+                $sectionnum = $mod->sectionnum;
+                if ($sectionnum==0) {
+                    $optgroup = get_string('activities');
+                } else if ($COURSE->format=='weeks') {
+                    $date = $COURSE->startdate + 7200 + ($sectionnum * 604800);
+                    $optgroup = userdate($date, $strsection).' - '.userdate($date + 518400, $strsection);
+                } else {
+                    $optgroup = $strsection.': '.$sectionnum;
+                }
+                if (empty($options[$optgroup])) {
+                    $options[$optgroup] = array();
+                }
+            }
+            $count++;
+
+            $name = block_activity_list::filter_text($mod->name);
+            //$name = $this->format_longtext($name);
+
+            // add this activity to the list
+            $optgroups[$optgroup][$cmid] = $name;
+        }
+
+        $name = 'cmids';
+        $config_name = 'config_'.$name.$i;
+        $params = array('multiple' => 'multiple', 'size' => min(8, $count));
+        $mform->addElement('selectgroups', $config_name, get_string($name, $plugin), $optgroups, $params);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+        $mform->addHelpButton($config_name, $name, $plugin);
+    }
+
+    /**
+     * add_field_namedisplay
+     *
+     * @param object $mform
+     * @param string $plugin
+     * @param integer $i
+     * @return void, but will modify $mform
+     */
+    protected function add_field_namedisplay($mform, $plugin, $i) {
+        $elements = array();
+
+        $name = 'search';
+        $config_name = 'config_'.$name.$i;
+        $elements[] = $mform->createElement('static', '', '', get_string($name, $plugin));
+        $elements[] = $mform->createElement('text', $config_name, '', array('size' => 15));
+
+        $name = 'case';
+        $config_name = 'config_'.$name.$i;
+        $options = array(
+            0 => get_string('caseinsensitive', $plugin),
+            1 => get_string('casesensitive', $plugin),
+        );
+        $elements[] = $mform->createElement('select', $config_name, '', $options);
+
+        $elements[] = $mform->createElement('static', '', '', html_writer::empty_tag('br'));
+
+        $name = 'replace';
+        $config_name = 'config_'.$name.$i;
+        $elements[] = $mform->createElement('static', '', '', get_string($name, $plugin));
+        $elements[] = $mform->createElement('text', $config_name, '', array('size' => 15));
+
+        $name = 'limit';
+        $config_name = 'config_'.$name.$i;
+        $options = array_slice(range(0, 5), 1, 5, true);
+        $elements[] = $mform->createElement('static', '', '', get_string($name, $plugin));
+        $elements[] = $mform->createElement('select', $config_name, '', $options);
+
+        $name = 'namedisplay';
+        $elements_name = 'elements_'.$name.$i;
+        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), ' ', false);
+        $mform->addHelpButton($elements_name, $name, $plugin);
+
+        $names = array('search'  => PARAM_TEXT, 'case'  => PARAM_INT,
+                       'replace' => PARAM_TEXT, 'limit' => PARAM_INT);
+        foreach ($names as $name => $type) {
+            $config_name = 'config_'.$name.$i;
+            $mform->setType($config_name, $type);
+            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
         }
     }
 

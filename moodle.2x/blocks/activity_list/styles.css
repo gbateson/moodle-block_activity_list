@@ -152,6 +152,35 @@ table.blockconfigtable td.itemvalue div.subitem input {
 }
 
 /*
+ * styles for block settings edit form
+ */
+
+#block_activity_list_edit_form div.fitem {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+#block_activity_list_edit_form div.fitem div.fitemtitle {
+	margin-bottom: 1px;
+	margin-right: 6px;
+	margin-top: 5px;
+    min-width: 240px;
+}
+
+#block_activity_list_edit_form div.fitem .felement {
+	margin-bottom: 1px;
+	margin-top: 5px;
+    width: auto;
+}
+
+#block_activity_list_edit_form div.fitem div.itemselect {
+    background-color: pink;
+    float: right;
+    text-align: center;
+    width: 72px;
+}
+
+/*
  * styles for the activity_list block
  */
 
