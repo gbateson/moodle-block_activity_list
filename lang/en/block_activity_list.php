@@ -14,6 +14,7 @@ $string['blockname'] = 'Activity list';
 $string['blocknameplural'] = 'Activity lists';
 
 // more strings
+$string['apply'] = 'Apply';
 $string['applyselectedvalues'] = 'Apply selected values to the following courses';
 $string['caseinsensitive'] = 'Case insensitive';
 $string['casesensitive'] = 'Case sensitive';
@@ -30,7 +31,7 @@ $string['include'] = 'Include';
 $string['index'] = 'Activity index pages';
 $string['invalidimportfile'] = 'Import file was missing, empty or invalid';
 $string['limit'] = 'Limit';
-$string['list'] = 'List ($a)';
+$string['list'] = 'List ({$a})';
 $string['listcount'] = 'Number of lists';
 $string['listcount_help'] = 'This setting specifies how many lists will appear in this block. The maximum number of lists is five.';
 $string['listtitle'] = 'List title';
@@ -38,7 +39,8 @@ $string['listtitle_help'] = 'This string will be displayed as the title for this
 $string['modfilter'] = 'Activity type filter';
 $string['modfilter_help'] = 'This setting specifies which type of activities are to be included in the activity list. Only activity types that occur in this course are included in the list.';
 $string['modindex_help'] = 'These checkboxes allow you to easily add links to the index pages of activity types listed here.';
-$string['mycourses_help'] ='	On this list you can specify other courses to which you wish to copy this block\'s settings. The list only includes courses where you are a teacher and which already have an Activity List block.';
+$string['mycourses'] = 'My courses';
+$string['mycourses_help'] ='On this list you can specify other courses to which you wish to copy this block\'s settings. The list only includes courses where you are a teacher and which already have an Activity List block.';
 $string['namedisplay'] = 'Name display';
 $string['namedisplay_help'] = 'These settings allow you to modify the activity names when they are displayed in this activity list.
 
@@ -62,17 +64,28 @@ $string['namefilter_help'] = 'These settings allow you to include or exclude act
 * If the **include** string is specified, then an activity will only be added to the activity list if its name matches the include string.
 * If the **exclude** string is specified, then an activity will not be added to the activity list if its name matches the exclude string.';
 $string['params'] = 'Link parameters';
-$string['params'] = '
-    Any parameters specified here will be added to the links to the activities.
-</p>
-<p>
-    The parameters are specified as: <i>name=value</i>.
-    If there are several parameters, they should be joined with an ampersand, &quot;&amp;&quot;, like this:
-</p>
+$string['params_help'] = 'Any parameters specified here will be added to the links to the activities.
+
+The parameters are specified as: *name=value*. If there are several parameters, they should be joined with an ampersand, &quot;&amp;&quot;, like this:
+
 * *name1=value1&amp;name2=value2&amp;name3=value3*';
 $string['replace'] = 'Replace';
 $string['save'] = 'Save';
 $string['search'] = 'Search';
+$string['selectallnone'] = 'Select';
+$string['selectallnone_help'] = 'The checkboxes in this column allow you to select certain settings in this block and copy them to TaskChain navigation blocks in other Moodle courses on this site.
+
+Settings can be selected individually, or you can use the "All" or
+"None" links to select all or none of the settings with one click.
+
+To select the courses to which you wish copy this block\'s settings,
+use the course menu at the bottom of this block configuration page.
+
+Note that you can only copy the settings to courses in which you are a teacher
+(or administrator) and which already have a TaskChain navigation block.
+
+To copy these settings to blocks in other Moodle sites, use the "export"
+function on this page, and the "import" function of the block on the destination site.';
 $string['separator'] = 'Separator';
 $string['separator_help'] = 'If specified, this text or html is inserted between each list displayed in this block. However, the separator will not be inserted before lists that have a title.';
 $string['settingsmenu'] = 'Settings menu';
