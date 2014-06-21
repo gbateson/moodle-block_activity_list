@@ -624,10 +624,10 @@ class block_activity_list_edit_form extends block_edit_form {
             'apply'      => addslashes_js(get_string('apply', $plugin)),
             'export'     => addslashes_js(get_string('exportsettings', $plugin)),
             'exporthelp' => addslashes_js($OUTPUT->help_icon('exportsettings', $plugin)),
-            'exportlink' => addslashes_js($CFG->wwwroot.'/blocks/activity_list/export.php?id='.$this->block->instance->id),
+            'exportlink' => addslashes_js($CFG->wwwroot.'/blocks/ungraded_activities/export.php?id='.$this->block->instance->id),
             'import'     => addslashes_js(get_string('importsettings', $plugin)),
             'importhelp' => addslashes_js($OUTPUT->help_icon('importsettings', $plugin)),
-            'importlink' => addslashes_js($CFG->wwwroot.'/blocks/activity_list/import.php?id='.$this->block->instance->id),
+            'importlink' => addslashes_js($CFG->wwwroot.'/blocks/ungraded_activities/import.php?id='.$this->block->instance->id),
             'none'       => addslashes_js(get_string('none')),
             'select'     => addslashes_js(get_string('selectallnone', $plugin)),
             'selecthelp' => addslashes_js($OUTPUT->help_icon('selectallnone', $plugin))
