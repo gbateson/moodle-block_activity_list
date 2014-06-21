@@ -75,17 +75,13 @@ $string['search'] = 'Search';
 $string['selectallnone'] = 'Select';
 $string['selectallnone_help'] = 'The checkboxes in this column allow you to select certain settings in this block and copy them to TaskChain navigation blocks in other Moodle courses on this site.
 
-Settings can be selected individually, or you can use the "All" or
-"None" links to select all or none of the settings with one click.
+Settings can be selected individually, or you can use the "All" or "None" links to select all or none of the settings with one click.
 
-To select the courses to which you wish copy this block\'s settings,
-use the course menu at the bottom of this block configuration page.
+To select the courses to which you wish copy this block\'s settings, use the course menu at the bottom of this block configuration page.
 
-Note that you can only copy the settings to courses in which you are a teacher
-(or administrator) and which already have a TaskChain navigation block.
+Note that you can only copy the settings to courses in which you are a teacher (or administrator) and which already have a TaskChain navigation block.
 
-To copy these settings to blocks in other Moodle sites, use the "export"
-function on this page, and the "import" function of the block on the destination site.';
+To copy these settings to blocks in other Moodle sites, use the "export" function on this page, and the "import" function of the block on the destination site.';
 $string['separator'] = 'Separator';
 $string['separator_help'] = 'If specified, this text or html is inserted between each list displayed in this block. However, the separator will not be inserted before lists that have a title.';
 $string['settingsmenu'] = 'Settings menu';
