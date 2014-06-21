@@ -136,11 +136,11 @@ class block_activity_list extends block_base {
      * it tries to apply selected settings to similar blocks
      * in other courses in which this user can edit blocks
      *
-     * @param object $data contains the new config form data
+     * @param object $config contains the new config form data
      * @param boolean $pinned (optional, default=false)
      * @return xxx
      */
-    function instance_config_save($data, $pinned=false) {
+    function instance_config_save($config, $pinned=false) {
         global $DB;
 
         // do nothing if user hit the "cancel" button
@@ -148,118 +148,110 @@ class block_activity_list extends block_base {
             return true;
         }
 
-        // expand "select_sectiontextlength", if required
-        if (isset($data->select_sectiontextlength)) {
-            $configs = array('name', 'head', 'tail');
-
-            $langs = $translations = get_string_manager()->get_list_of_translations();
-            $langs = array_keys($langs);
-            array_unshift($langs, '');
-
-            foreach ($langs as $lang) {
-                $lang = substr($lang, 0, 2);
-                foreach ($configs as $config) {
-                    $selectname = 'select_'.$config.'length'.$lang;
-                    $data->$selectname = $data->select_sectiontextlength;
-                }
-            }
-            unset($data->select_textlength);
-        }
-
-        // ensure sensible value for $data->listcount
+        // ensure sensible value for $config->listcount
         $name = 'listcount';
-        $count = 5; // max number of filters
-        if (isset($data->$name) && is_numeric($data->$name)) {
-            $data->$name = max(0, min($count, $data->$name));
+        $min = 0; // min number of lists
+        $max = 5; // max number of lists
+        if (isset($config->$name)) {
+            $config->$name = max($min, min($max, $config->$name));
         } else {
-            $data->$name = 1; // default
+            $config->$name = $min;
         }
 
-        // field names in name filter and name display settings
-        $groups = array(
-            'namefilter' => array('include', 'exclude'),
-            'namedisplay' => array('search', 'case', 'replace', 'limit'),
+        // selected fields to be copied to other occurrences of this block
+        $selected = array();
+
+        // single occurrence fields
+        $names = array('title', 'textlength', 'listcount', 'separator');
+        foreach ($names as $name) {
+            $selectname = 'select_'.$name;
+            if (empty($_POST[$selectname])) {
+                continue;
+            }
+            switch ($name) {
+                case 'textlength':
+                    $langs = $translations = get_string_manager()->get_list_of_translations();
+                    $langs = array_keys($langs);
+                    array_unshift($langs, '');
+                    foreach ($langs as $lang) {
+                        $selected[] = 'namelength'.$lang;
+                        $selected[] = 'headlength'.$lang;
+                        $selected[] = 'taillength'.$lang;
+                    }
+                    break;
+                default:
+                    $selected[] = $name;
+            }
+        }
+
+        // multiple occurrence fields (one per list)
+        $names = array(
+            'listtitle', 'text', 'modname', 'namefilter', 'cmids',
+            'namedisplay', 'sort', 'params', 'index', 'special',
         );
 
-        for ($i=0; $i<$data->listcount; $i++) {
+        // reduce arrays: cmids, index, special
+        for ($i=0; $i<$config->listcount; $i++) {
 
-            // expand name filter and name display settings, if required
-            foreach ($groups as $group => $names) {
-                $selectgroup = 'select_'.$group.$i;
-                if (empty($data->$selectgroup)) {
-                    $data->$selectgroup = 0;
+            foreach ($names as $name) {
+                $selectname = 'select_'.$name.$i;
+                if (empty($_POST[$selectname])) {
+                    continue;
                 }
-                foreach ($names as $name) {
-                    $selectname = 'select_'.$name.$i;
-                    $data->$selectname = $data->$selectgroup;
+                switch ($name) {
+                    case 'namefilter':
+                        $selected[] = 'include'.$i;
+                        $selected[] = 'exclude'.$i;
+                        break;
+                    case 'namedisplay':
+                        $selected[] = 'search'.$i;
+                        $selected[] = 'case'.$i;
+                        $selected[] = 'replace'.$i;
+                        $selected[] = 'limit'.$i;
+                        break;
+                    default:
+                        $selected[] = $name.$i;
                 }
-                unset($data->$selectgroup);
             }
 
             // convert cmids array to string
-            $cmids = 'cmids'.$i;
-            if (isset($data->$cmids) && is_array($data->$cmids)) {
-                $data->$cmids = array_filter($data->$cmids); // remove empties
-                $data->$cmids = implode(',', $data->$cmids); // convert to string
+            $name = 'cmids'.$i;
+            if (isset($config->$name) && is_array($config->$name)) {
+                $config->$name = array_filter($config->$name); // remove empties
+                $config->$name = implode(',', $config->$name); // convert to string
             }
 
             // convert activity index array to string
-            $index = 'index'.$i;
-            if (isset($data->$index) && is_array($data->$index)) {
-                $data->$index = array_keys($data->$index, 1); // selected keys only
-                $data->$index = implode(',', $data->$index); // convert to string
+            $name = 'index'.$i;
+            if (isset($config->$name) && is_array($config->$name)) {
+                $config->$name = array_keys($config->$name, 1); // selected keys only
+                $config->$name = implode(',', $config->$name); // convert to string
             }
 
             // convert special moodle links array to string
-            $special = 'special'.$i;
-            if (isset($data->$special) && is_array($data->$special)) {
-                $data->$special = array_keys($data->$special, 1);
-                $data->$special = array_reduce($data->$special, array($this, 'bitwise_or'), 0);
+            $name = 'special'.$i;
+            if (isset($config->$name) && is_array($config->$name)) {
+                $config->$name = array_keys($config->$name, 1);
+                $config->$name = array_reduce($config->$name, array($this, 'bitwise_or'), 0);
             }
         }
 
-        $names = array(
-            'title', 'text', 'cmids', 'index', 'modname', 'include', 'exclude',
-            'search', 'case', 'replace', 'limit', 'sort', 'params'
-        );
-
-        $i = $this->config->listcount;
-        while (($name = $names[0].$i) && isset($this->config->$name)) {
+        // remove superfluous list fields
+        $i = $config->listcount;
+        while (isset($this->config->{$names[0].$i})) {
             foreach ($names as $name) {
-                $name .= "$i";
-                unset($this->config->$name);
+                unset($this->config->{$name.$i});
             }
             $i++;
         }
 
-        $selected = array();
-        $contextids = array();
+        // copy selected values to block instance in another course
+        if (isset($config->mycourses) && is_array($config->mycourses)) {
+            $contextids = implode(',', $config->mycourses);
 
-        $vars = get_object_vars($data);
-        foreach ($vars as $name => $value) {
-
-            $selectname = 'select_'.$name;
-            if (empty($data->$selectname)) {
-                $data->$selectname = 0;
-            }
-
-            if ($name=='mycontextids') {
-                $contextids = $value;
-            } else if ($data->$selectname) {
-                $selected[$name] = stripslashes_recursive($value);
-            }
-
-            // remove "select_" field
-            unset($data->$selectname);
-        }
-        unset($vars, $name, $value);
-
-        // get ids of courses (excluding this one) in which user can edit blocks
-        if ($contextids = implode(',', $contextids)) {
-
-            // get TaskChain navigation blocks in selected courses
+            // get Activity List block instances in selected courses
             $select = "blockname = ? AND pagetypepattern = ? AND parentcontextid IN ($contextids)";
-            $params = arary($this->instance->blockname, 'course-view-*');
+            $params = array($this->instance->blockname, 'course-view-*');
             if ($instances = $DB->get_records_select('block_instances', $select, $params)) {
 
                 // user requires this capbility to update blocks
@@ -269,8 +261,12 @@ class block_activity_list extends block_base {
                 foreach ($instances as $instance) {
                     if (has_capability($capability, $instance->parentcontextid)) {
                         $instance->config = unserialize(base64_decode($instance->configdata));
-                        foreach ($selected as $name => $value) {
-                            $instance->config->$name = $value;
+                        foreach ($selected as $name) {
+                            if (empty($config->$name)) {
+                                unset($instance->config->$name);
+                            } else {
+                                $instance->config->$name = $value;
+                            }
                         }
                         $instance->configdata = base64_encode(serialize($instance->config));
                         set_field('block_instances', 'configdata', $instance->configdata, 'id', $instance->id);
@@ -278,9 +274,10 @@ class block_activity_list extends block_base {
                 }
             }
         }
+        unset($config->mycourses);
 
         //  save config settings as usual
-        return parent::instance_config_save($data, $pinned);
+        return parent::instance_config_save($config, $pinned);
     }
 
     /**
@@ -361,7 +358,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $CFG->wwwroot.'/mod/'.$cm->modname.'/index.php?id='.$COURSE->id,
-                        'icon'         => $CFG->modpixpath.'/'.$cm->modname.'/icon.gif'
+                        'icon'         => $PAGE->theme->pix_url('icon', $cm->modname)->out()
                     );
 
                     // remove this $cm->modname, so it only appears once in the list
@@ -444,7 +441,7 @@ class block_activity_list extends block_base {
                             'originalname' => $originalname,
                             'displayname'  => $originalname,
                             'href'         => $CFG->wwwroot.'/grade/report/index.php?id='.$COURSE->id,
-                            'icon'         => $CFG->pixpath.'/i/grades.gif'
+                            'icon'         => $PAGE->theme->pix_url('i/grades', 'core')->out()
                         );
                     }
                 }
@@ -455,7 +452,7 @@ class block_activity_list extends block_base {
                             'originalname' => $originalname,
                             'displayname'  => $originalname,
                             'href'         => $CFG->wwwroot.'/user/index.php?id='.$COURSE->id,
-                            'icon'         => $CFG->pixpath.'/i/users.gif'
+                            'icon'         => $PAGE->theme->pix_url('i/users', 'core')->out()
                         );
                     }
                 }
@@ -467,7 +464,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $href,
-                        'icon'         => $CFG->pixpath.'/t/calendar.gif'
+                        'icon'         => $PAGE->theme->pix_url('t/calendar', 'core')->out()
                     );
                 }
                 if ($this->config->$special & self::SPECIAL_COURSES) {
@@ -476,7 +473,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $CFG->wwwroot.'/course/index.php',
-                        'icon'         => $CFG->pixpath.'/i/course.gif'
+                        'icon'         => $PAGE->theme->pix_url('i/course', 'core')->out()
                     );
                 }
                 if ($this->config->$special & self::SPECIAL_SITEPAGE) {
@@ -485,7 +482,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $CFG->wwwroot.'/course/view.php?id='.SITEID,
-                        'icon'         => $CFG->pixpath.'/c/site.gif'
+                        'icon'         => $PAGE->theme->pix_url('i/siteevent', 'core')->out()
                     );
                 }
                 if ($this->config->$special & self::SPECIAL_MYMOODLE) {
@@ -494,7 +491,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $CFG->wwwroot.'/my/',
-                        'icon'         => $CFG->pixpath.'/i/moodle_host.gif'
+                        'icon'         => $PAGE->theme->pix_url('i/moodle_host', 'core')->out()
                     );
                 }
             }

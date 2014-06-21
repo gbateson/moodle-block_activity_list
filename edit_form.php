@@ -39,6 +39,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class block_activity_list_edit_form extends block_edit_form {
 
+    public $modnames = array();
+
     /**
      * specific_definition
      *
@@ -52,12 +54,6 @@ class block_activity_list_edit_form extends block_edit_form {
         // cache the plugin name, because
         // it is quite long and we use it a lot
         $plugin = 'block_activity_list';
-
-        // cache commonly used menu options
-        $depth_options  = range(0, 10);
-        $length_options = range(0, 20);
-        $grade_options  = array_reverse(range(0, 100), true);
-        $keep_options   = array(0 => get_string('remove'), 1 => get_string('keep'));
 
         //-----------------------------------------------------------------------------
         $this->add_header($mform, $plugin, 'title');
@@ -131,44 +127,14 @@ class block_activity_list_edit_form extends block_edit_form {
             default: $strsection = get_string('section');
         }
 
-        $sortoptions = array(
-            0 => get_string('sortsectionsequence', $plugin),
-            1 => get_string('sortoriginalname', $plugin),
-            2 => get_string('sortdisplayname', $plugin)
-        );
-
-        $modnames = $this->get_modnames();
-
         for ($i=0; $i<$this->block->config->listcount; $i++) {
-            $title   = 'title'.$i;
-            $text    = 'text'.$i;
-            $cmids   = 'cmids'.$i;
-            $index   = 'index'.$i;
-            $modname = 'modname'.$i;
-            $include = 'include'.$i;
-            $exclude = 'exclude'.$i;
-            $search  = 'search'.$i;
-            $case    = 'case'.$i;
-            $replace = 'replace'.$i;
-            $limit   = 'limit'.$i;
-            $sort    = 'sort'.$i;
-            $params  = 'params'.$i;
-            $special = 'special'.$i;
 
-            $namefilter = 'namefilter'.$i;
-            $namedisplay = 'namedisplay'.$i;
-
-            $index_array = explode(',', $this->block->config->$index);
-            $index_array = array_filter($index_array); // remove blanks
-
-            //-------------------------------------------------------------------------
             $name = 'list';
-            $label = get_string('list', $plugin, ($i+1));
+            $label = get_string($name, $plugin, ($i+1));
             $mform->addElement('header', $name.$i, $label);
             if (method_exists($mform, 'setExpanded')) {
                 $mform->setExpanded($name.$i, true);
             }
-            //-------------------------------------------------------------------------
 
             $name = 'listtitle';
             $config_name = 'config_'.$name.$i;
@@ -185,9 +151,10 @@ class block_activity_list_edit_form extends block_edit_form {
             $mform->setDefault($config_name, $this->defaultvalue($name.$i));
             $mform->addHelpButton($config_name, $name, $plugin);
 
-            $name = 'modfilter';
+            $name = 'modname';
             $config_name = 'config_'.$name.$i;
-            $mform->addElement('select', $config_name, get_string($name, $plugin), $modnames);
+            $options = array('0' => get_string('none')) + $this->modnames;
+            $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
             $mform->setType($config_name, PARAM_PLUGIN);
             $mform->setDefault($config_name, $this->defaultvalue($name.$i));
             $mform->addHelpButton($config_name, $name, $plugin);
@@ -195,25 +162,10 @@ class block_activity_list_edit_form extends block_edit_form {
             $this->add_field_namefilter($mform, $plugin, $i);
             $this->add_field_cmids($mform, $plugin, $i);
             $this->add_field_namedisplay($mform, $plugin, $i);
-
-            $name = 'sort';
-            $config_name = 'config_'.$name.$i;
-            $options = array(
-                0 => get_string('sortsectionsequence', $plugin),
-                1 => get_string('sortoriginalname', $plugin),
-                2 => get_string('sortdisplayname', $plugin)
-            );
-            $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
-            $mform->setType($config_name, PARAM_INT);
-            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
-            $mform->addHelpButton($config_name, $name, $plugin);
-
-            $name = 'params';
-            $config_name = 'config_'.$name.$i;
-            $mform->addElement('text', $config_name, get_string($name, $plugin), array('size' => 24));
-            $mform->setType($config_name, PARAM_TEXT);
-            $mform->setDefault($config_name, $this->defaultvalue($name.$i));
-            $mform->addHelpButton($config_name, $name, $plugin);
+            $this->add_field_sort($mform, $plugin, $i);
+            $this->add_field_params($mform, $plugin, $i);
+            $this->add_field_index($mform, $plugin, $i);
+            $this->add_field_special($mform, $plugin, $i);
         }
     }
 
@@ -279,8 +231,8 @@ class block_activity_list_edit_form extends block_edit_form {
             if ($cm->modname=='label') {
                 continue; // ignore labels
             }
-            if (empty($modnames[$cm->modname])) {
-                $modnames[$cm->modname] = get_string('modulenameplural', $cm->modname);
+            if (empty($this->modnames[$cm->modname])) {
+                $this->modnames[$cm->modname] = get_string('modulenameplural', $cm->modname);
             }
 
             // get language, if any
@@ -307,6 +259,7 @@ class block_activity_list_edit_form extends block_edit_form {
         // remove languages that are not available on this site
         $langs = array_filter($langs);
         ksort($langs);
+        asort($this->modnames);
 
         // cache some useful strings and textbox params
         $total = html_writer::tag('small', get_string('total', $plugin).': ');
@@ -338,38 +291,15 @@ class block_activity_list_edit_form extends block_edit_form {
         }
 
         $name = 'textlength';
-        $mform->addGroup($elements, $name, get_string($name, $plugin), ' ', false);
-        $mform->addHelpButton($name, $name, $plugin);
+        $elements_name = 'elements_'.$name;
+        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), ' ', false);
+        $mform->addHelpButton($elements_name, $name, $plugin);
 
         foreach ($elements as $element) {
             if ($element->getType()=='text') {
                 $mform->setType($element->getName(), PARAM_INT);
             }
         }
-    }
-
-    /**
-     * get_modnames
-     *
-     * @return array of modnames used in this course
-     */
-    protected function get_modnames() {
-        global $COURSE, $USER;
-        $modnames = array();
-
-        // pick out mod names
-        $modinfo = get_fast_modinfo($COURSE, $USER->id);
-        foreach ($modinfo->cms as $cmid => $cm) {
-            if ($cm->modname=='label') {
-                continue; // ignore labels
-            }
-            if (empty($modnames[$cm->modname])) {
-                $modnames[$cm->modname] = get_string('modulenameplural', $cm->modname);
-            }
-        }
-
-        asort($modnames);
-        return array('' => get_string('none')) + $modnames;
     }
 
     /**
@@ -511,8 +441,10 @@ class block_activity_list_edit_form extends block_edit_form {
         $mform->addGroup($elements, $elements_name, get_string($name, $plugin), ' ', false);
         $mform->addHelpButton($elements_name, $name, $plugin);
 
-        $names = array('search'  => PARAM_TEXT, 'case'  => PARAM_INT,
-                       'replace' => PARAM_TEXT, 'limit' => PARAM_INT);
+        $names = array('search'  => PARAM_TEXT,
+                       'case'    => PARAM_INT,
+                       'replace' => PARAM_TEXT,
+                       'limit'   => PARAM_INT);
         foreach ($names as $name => $type) {
             $config_name = 'config_'.$name.$i;
             $mform->setType($config_name, $type);
@@ -521,20 +453,127 @@ class block_activity_list_edit_form extends block_edit_form {
     }
 
     /**
+     * add_field_sort
+     *
+     * @param object $mform
+     * @param string $plugin
+     * @param integer $i
+     * @return void, but will modify $mform
+     */
+    protected function add_field_sort($mform, $plugin, $i) {
+        $name = 'sort';
+        $config_name = 'config_'.$name.$i;
+        $options = array(
+            0 => get_string('sortsectionsequence', $plugin),
+            1 => get_string('sortoriginalname', $plugin),
+            2 => get_string('sortdisplayname', $plugin)
+        );
+        $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+        $mform->addHelpButton($config_name, $name, $plugin);
+    }
+
+    /**
+     * add_field_params
+     *
+     * @param object $mform
+     * @param string $plugin
+     * @param integer $i
+     * @return void, but will modify $mform
+     */
+    protected function add_field_params($mform, $plugin, $i) {
+        $name = 'params';
+        $config_name = 'config_'.$name.$i;
+        $mform->addElement('text', $config_name, get_string($name, $plugin), array('size' => 24));
+        $mform->setType($config_name, PARAM_TEXT);
+        $mform->setDefault($config_name, $this->defaultvalue($name.$i));
+        $mform->addHelpButton($config_name, $name, $plugin);
+    }
+
+    /**
+     * add_field_index
+     *
+     * @param object $mform
+     * @param string $plugin
+     * @param integer $i
+     * @return void, but will modify $mform
+     */
+    protected function add_field_index($mform, $plugin, $i) {
+        $name = 'index';
+        $config_name = 'config_'.$name.$i;
+        $elements_name = 'elements_'.$name.$i;
+
+        $elements = array();
+        foreach ($this->modnames as $modname => $text) {
+            $elements[] = $mform->createElement('checkbox', $config_name.'['.$modname.']', '', $text);
+        }
+
+        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), html_writer::empty_tag('br'), false);
+        $mform->addHelpButton($elements_name, $name, $plugin);
+
+        $defaultvalue = $this->defaultvalue($name.$i);
+        $defaultvalue = explode(',', $defaultvalue);
+
+        foreach ($this->modnames as $modname => $text) {
+            $mform->setType($config_name.'['.$modname.']', PARAM_INT);
+            $mform->setDefault($config_name.'['.$modname.']', in_array($modname, $defaultvalue));
+        }
+    }
+
+    /**
+     * add_field_special
+     *
+     * @param object $mform
+     * @param string $plugin
+     * @param integer $i
+     * @return void, but will modify $mform
+     */
+    protected function add_field_special($mform, $plugin, $i) {
+        $name = 'special';
+        $config_name = 'config_'.$name.$i;
+        $elements_name = 'elements_'.$name.$i;
+
+        $specials = array(
+            block_activity_list::SPECIAL_GRADES   => get_string('grades'),
+            block_activity_list::SPECIAL_PARTICIPANTS => get_string('participants'),
+            block_activity_list::SPECIAL_CALENDAR => get_string('calendar', 'calendar'),
+            block_activity_list::SPECIAL_COURSES  => get_string('courses', 'admin'),
+            block_activity_list::SPECIAL_MYMOODLE => get_string('mymoodle', 'admin'),
+            block_activity_list::SPECIAL_SITEPAGE => get_string('frontpage', 'admin')
+        );
+
+        $elements = array();
+        foreach ($specials as $special => $text) {
+            $elements[] = $mform->createElement('checkbox', $config_name.'['.$special.']', '', $text);
+        }
+
+        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), html_writer::empty_tag('br'), false);
+        $mform->addHelpButton($elements_name, $name, $plugin);
+
+        $defaultvalue = $this->defaultvalue($name.$i);
+
+        foreach ($specials as $special => $text) {
+            $mform->setType($config_name.'['.$special.']', PARAM_INT);
+            $mform->setDefault($config_name.'['.$special.']', min(1, $defaultvalue & $special));
+        }
+    }
+
+    /**
      * get_mycourses
      *
-     * @return mixed, either an array() of accessible courses with similar block, or FALSE
+     * @return mixed, either an array(coursecontextid) of accessible courses with similar block, or FALSE
      */
     protected function get_mycourses() {
         global $COURSE, $DB;
 
         $mycourses = array();
 
-        $select = 'bi.id, c.id AS courseid, c.shortname, ctx.id AS contextid';
+        $select = 'bi.id, ctx.id AS contextid, c.id AS courseid, c.shortname';
         $from   = '{block_instances} bi '.
                   'JOIN {context} ctx ON bi.parentcontextid = ctx.id '.
                   'JOIN {course} c ON ctx.instanceid = c.id';
-        $where  = 'bi.blockname = ? AND bi.pagetypepattern = ? AND ctx.contextlevel = ? AND c.id <> ? AND c.id <> ?';
+        $where  = 'bi.blockname = ? AND bi.pagetypepattern = ? AND ctx.contextlevel = ? AND ctx.instanceid <> ? AND ctx.instanceid <> ?';
         $order  = 'c.sortorder ASC';
         $params = array('activity_list', 'course-view-*', CONTEXT_COURSE, SITEID, $COURSE->id);
 
@@ -604,6 +643,7 @@ class block_activity_list_edit_form extends block_edit_form {
         $js .= "        var fcontainer = new RegExp('\\\\bfcontainer\\\\b');\n";
         $js .= "        var fempty = new RegExp('\\\\bfemptylabel\\\\b');\n";
         $js .= "        var fitem = new RegExp('\\\\bfitem\\\\b');\n";
+        $js .= "        var fid = new RegExp('^f[a-z]+_id_(elements_)?(config_)?(.*)');\n";
         $js .= "        var i_max = obj.length;\n";
         $js .= "        var addSelect = true;\n";
         $js .= "        for (var i=0; i<i_max; i++) {\n";
@@ -657,7 +697,6 @@ class block_activity_list_edit_form extends block_edit_form {
 
         $js .= "                } else {\n";
         $js .= "                    var elm = document.createElement('INPUT');\n";
-        $js .= "                    elm.id = 'select_' + obj[i].id.substr(9);\n";
         $js .= "                    elm.style.margin = '6px auto';\n";
 
         $js .= "                    if (obj[i].id=='fitem_id_config_mycourses') {\n";
@@ -665,6 +704,9 @@ class block_activity_list_edit_form extends block_edit_form {
         $js .= "                        elm.value = '$str->apply';\n";
         $js .= "                    } else {\n";
         $js .= "                        elm.type = 'checkbox';\n";
+        $js .= "                        elm.value = 1;\n";
+        $js .= "                        elm.name = 'select_' + obj[i].id.replace(fid, '\$3');\n";
+        $js .= "                        elm.id = 'id_select_' + obj[i].id.replace(fid, '\$3');\n";
         $js .= "                    }\n";
         $js .= "                }\n";
 
