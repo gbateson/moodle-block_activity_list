@@ -266,13 +266,13 @@ class block_activity_list extends block_base {
                     }
                     if (has_capability($capability, $context)) {
                         $instance->config = unserialize(base64_decode($instance->configdata));
+                        if (empty($instance->config)) {
+                            $instance->config = new stdClass();
+                        }
                         foreach ($selected as $name) {
                             if (empty($config->$name)) {
                                 unset($instance->config->$name);
                             } else {
-                                if (empty($instance->config)) {
-                                    $instance->config = new stdClass();
-                                }
                                 $instance->config->$name = $config->$name;
                             }
                         }
