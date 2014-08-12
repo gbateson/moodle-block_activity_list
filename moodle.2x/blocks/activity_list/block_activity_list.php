@@ -259,17 +259,25 @@ class block_activity_list extends block_base {
 
                 // update values in the selected block instances
                 foreach ($instances as $instance) {
-                    if (has_capability($capability, $instance->parentcontextid)) {
+                    if (class_exists('context')) {
+                        $context = context::instance_by_id($instance->parentcontextid);
+                    } else {
+                        $context = get_context_instance_by_id($instance->parentcontextid);
+                    }
+                    if (has_capability($capability, $context)) {
                         $instance->config = unserialize(base64_decode($instance->configdata));
                         foreach ($selected as $name) {
                             if (empty($config->$name)) {
                                 unset($instance->config->$name);
                             } else {
-                                $instance->config->$name = $value;
+                                if (empty($instance->config)) {
+                                    $instance->config = new stdClass();
+                                }
+                                $instance->config->$name = $config->$name;
                             }
                         }
                         $instance->configdata = base64_encode(serialize($instance->config));
-                        set_field('block_instances', 'configdata', $instance->configdata, 'id', $instance->id);
+                        $DB->set_field('block_instances', 'configdata', $instance->configdata, array('id' => $instance->id));
                     }
                 }
             }
@@ -798,7 +806,7 @@ class block_activity_list extends block_base {
             $class = context_helper::get_class_for_level($contextlevel);
             return call_user_func(array($class, 'instance'), $instanceid, $strictness);
         } else {
-            return self::context($contextlevel, $instanceid);
+            return get_context_instance($contextlevel, $instanceid);
         }
     }
 
