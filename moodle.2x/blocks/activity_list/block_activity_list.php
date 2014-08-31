@@ -435,10 +435,15 @@ class block_activity_list extends block_base {
             }
 
             if ($this->config->$special) {
+                switch (true) {
+                    case isset($PAGE->context):   $context = $PAGE->context; break;
+                    case isset($COURSE->context): $context = $COURSE->context; break;
+                    default:                      $context = self::context(CONTEXT_COURSE, $COURSE->id);
+                }
                 if ($this->config->$special & self::SPECIAL_GRADES) {
-                    if ($COURSE->showgrades && has_capability('moodle/grade:view', $COURSE->context)) {
+                    if ($COURSE->showgrades && has_capability('moodle/grade:view', $context)) {
                         $showgrades = true; // student
-                    } else if (has_capability('moodle/grade:viewall', $COURSE->context)) {
+                    } else if (has_capability('moodle/grade:viewall', $context)) {
                         $showgrades = true; // teacher
                     } else {
                         $showgrades = false;
@@ -454,7 +459,7 @@ class block_activity_list extends block_base {
                     }
                 }
                 if ($this->config->$special & self::SPECIAL_PARTICIPANTS) {
-                    if (has_capability('moodle/course:viewparticipants', $COURSE->context)) {
+                    if (has_capability('moodle/course:viewparticipants', $context)) {
                         $originalname = get_string('participants');
                         $list->specials[] = (object)array(
                             'originalname' => $originalname,
