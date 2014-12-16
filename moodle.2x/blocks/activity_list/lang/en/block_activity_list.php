@@ -13,6 +13,9 @@ $string['blockdescription'] = 'This block displays a list of useful links in a c
 $string['blockname'] = 'Activity list';
 $string['blocknameplural'] = 'Activity lists';
 
+// roles strings
+$string['activity_list:addinstance'] = 'Add a new Activity List block';
+
 // more strings
 $string['apply'] = 'Apply';
 $string['applyselectedvalues'] = 'Apply selected values to the following courses';
