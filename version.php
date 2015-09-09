@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$plugin->requires = 2010112400;
-$plugin->release  = '2014.12.16 (02)';
-$plugin->version  = 2014121602;
+$plugin->component = 'block_activity_list';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->requires  = 2010112400; // Moodle 2.0
+$plugin->version   = 2015090903;
+$plugin->release   = '2015.09.09 (03)';
