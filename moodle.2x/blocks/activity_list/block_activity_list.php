@@ -14,7 +14,7 @@
 (4) allow custom CSS (external and internal)
 (5) allow custom JS (e.g. PrettyPhoto)
 (6) open in new window (+ settings !!)
-(7) rename to quizport_links ?
+(7) rename to taskchain_links ?
  ********************************/
 
  // disable direct access to this block
@@ -255,7 +255,7 @@ class block_activity_list extends block_base {
             if ($instances = $DB->get_records_select('block_instances', $select, $params)) {
 
                 // user requires this capbility to update blocks
-                $capability = 'block/taskchain_navigation:addinstance';
+                $capability = 'block/activity_list:addinstance';
 
                 // update values in the selected block instances
                 foreach ($instances as $instance) {
@@ -761,8 +761,8 @@ class block_activity_list extends block_base {
                 // go to a specific page in a lesson
                 break;
 
-            case 'quizport':
-                // go to a specific quiz in a quizport
+            case 'taskchain':
+                // go to a specific quiz in a taskchain
                 break;
 
             case 'wiki':
