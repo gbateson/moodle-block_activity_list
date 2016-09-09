@@ -104,7 +104,7 @@ class block_activity_list_edit_form extends block_edit_form {
                 $mform->setDefault($config_name, $this->defaultvalue($name));
                 $mform->addHelpButton($config_name, $name, $plugin);
 
-                $this->add_importexport($mform, $plugin);
+                $this->add_selectallnone($mform, $plugin);
             }
         }
     }
@@ -222,21 +222,24 @@ class block_activity_list_edit_form extends block_edit_form {
      * @return void, but will update $mform
      */
     protected function add_field_description($mform, $plugin, $name) {
+        global $OUTPUT;
 
         $label = get_string($name);
         $text = get_string('block'.$name, $plugin);
 
         $params = array('id' => $this->block->instance->id);
-        $params = array('href' => new moodle_url('/blocks/activity_list/export.php', $params));
+        $params = array('href' => new moodle_url('/blocks/maj_submissions/export.php', $params));
 
         $text .= html_writer::empty_tag('br');
         $text .= html_writer::tag('a', get_string('exportsettings', $plugin), $params);
+        $text .= ' '.$OUTPUT->help_icon('exportsettings', $plugin);
 
         $params = array('id' => $this->block->instance->id);
-        $params = array('href' => new moodle_url('/blocks/activity_list/import.php', $params));
+        $params = array('href' => new moodle_url('/blocks/maj_submissions/import.php', $params));
 
         $text .= html_writer::empty_tag('br');
         $text .= html_writer::tag('a', get_string('importsettings', $plugin), $params);
+        $text .= ' '.$OUTPUT->help_icon('importsettings', $plugin);
 
         $mform->addElement('static', $name, $label, $text);
     }
@@ -638,27 +641,18 @@ class block_activity_list_edit_form extends block_edit_form {
     }
 
     /**
-     * add_importexport
+     * add_selectallnone
      *
      * @param object  $mform
      * @param string  $plugin
      * @return void, but will update $mform
      */
-    protected function add_importexport($mform, $plugin) {
-        global $CFG, $OUTPUT;
-
-        $exportlink = new moodle_url('/blocks/activity_list/export.php', array('id' => $this->block->instance->id));
-        $importlink = new moodle_url('/blocks/activity_list/import.php', array('id' => $this->block->instance->id));
+    protected function add_selectallnone($mform, $plugin) {
+        global $OUTPUT;
 
         $str = (object)array(
             'all'        => addslashes_js(get_string('all')),
             'apply'      => addslashes_js(get_string('apply', $plugin)),
-            'export'     => addslashes_js(get_string('exportsettings', $plugin)),
-            'exporthelp' => addslashes_js($OUTPUT->help_icon('exportsettings', $plugin)),
-            'exportlink' => addslashes_js($exportlink),
-            'import'     => addslashes_js(get_string('importsettings', $plugin)),
-            'importhelp' => addslashes_js($OUTPUT->help_icon('importsettings', $plugin)),
-            'importlink' => addslashes_js($importlink),
             'none'       => addslashes_js(get_string('none')),
             'select'     => addslashes_js(get_string('selectallnone', $plugin)),
             'selecthelp' => addslashes_js($OUTPUT->help_icon('selectallnone', $plugin))
@@ -667,7 +661,7 @@ class block_activity_list_edit_form extends block_edit_form {
         $js = '';
         $js .= '<script type="text/javascript">'."\n";
         $js .= "//<![CDATA[\n";
-        $js .= "function add_importexport() {\n";
+        $js .= "function add_selectallnone() {\n";
         $js .= "    var obj = document.getElementsByTagName('DIV');\n";
         $js .= "    if (obj) {\n";
         $js .= "        var fbuttons = new RegExp('\\\\bfitem_actionbuttons\\\\b');\n";
@@ -691,21 +685,6 @@ class block_activity_list_edit_form extends block_edit_form {
 
         $js .= "                    var elm = document.createElement('SPAN');\n";
         $js .= "                    elm.style.margin = '6px auto';\n";
-
-/**
-        $js .= "                    var lnk = document.createElement('A');\n";
-        $js .= "                    lnk.appendChild(document.createTextNode('$str->import'));\n";
-        $js .= "                    lnk.href = '$str->importlink';\n";
-        $js .= "                    elm.appendChild(lnk);\n";
-        $js .= "                    elm.innerHTML += '$str->importhelp';\n";
-        $js .= "                    elm.appendChild(document.createElement('BR'));\n";
-
-        $js .= "                    var lnk = document.createElement('A');\n";
-        $js .= "                    lnk.appendChild(document.createTextNode('$str->export'));\n";
-        $js .= "                    lnk.href = '$str->exportlink';\n";
-        $js .= "                    elm.appendChild(lnk);\n";
-        $js .= "                    elm.innerHTML += '$str->exporthelp';\n";
-**/
 
         $js .= "                    var elm = document.createElement('SPAN');\n";
         $js .= "                    elm.style.margin = '6px auto';\n";
@@ -753,11 +732,11 @@ class block_activity_list_edit_form extends block_edit_form {
         $js .= "    }\n";
         $js .= "}\n";
         $js .= "if (window.addEventListener) {\n";
-        $js .= "    window.addEventListener('load', add_importexport, false);\n";
+        $js .= "    window.addEventListener('load', add_selectallnone, false);\n";
         $js .= "} else if (window.attachEvent) {\n";
-        $js .= "    window.attachEvent('onload', add_importexport);\n";
+        $js .= "    window.attachEvent('onload', add_selectallnone);\n";
         $js .= "} else {\n";
-        $js .= "    window.onload = add_importexport;\n";
+        $js .= "    window.onload = add_selectallnone;\n";
         $js .= "}\n";
         $js .= "//]]>\n";
         $js .= "</script>\n";
