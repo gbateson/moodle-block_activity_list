@@ -66,22 +66,14 @@ if ($config = unserialize(base64_decode($block_instance->configdata))) {
         if (empty($name) || is_array($value) || is_object($value)) {
             continue; // shouldn't happen !!
         }
-        $printedconfig = false;
+        $content .= '    <CONFIGFIELD>'."\n";
+        $content .= '      <NAME>'.xml_tag_safe_content($name).'</NAME>'."\n";
         if (preg_match('/^cmids[0-9]+/', $name)) { // list of $cmids
-            $printedname = false;
             $value = explode(',', $value);
             $value = array_filter($value);
             foreach ($value as $cmid) {
                 if (empty($modinfo->cms[$cmid])) {
                     continue; // shouldn't happen !!
-                }
-                if ($printedconfig==false) {
-                    $printedconfig = true;
-                    $content .= '    <CONFIGFIELD>'."\n";
-                }
-                if ($printedname==false) {
-                    $printedname = true; // first time only
-                    $content .= '      <NAME>'.xml_tag_safe_content($name).'</NAME>'."\n";
                 }
                 // for each $cmid we store the section number, activity type and activity name
                 // and hope that there is a matching activity in the import target course
@@ -89,17 +81,12 @@ if ($config = unserialize(base64_decode($block_instance->configdata))) {
                 $content .= '        <SECTIONNUM>'.xml_tag_safe_content($modinfo->get_cm($cmid)->sectionnum).'</SECTIONNUM>'."\n";
                 $content .= '        <MODNAME>'.xml_tag_safe_content($modinfo->get_cm($cmid)->modname).'</MODNAME>'."\n";
                 $content .= '        <NAME>'.xml_tag_safe_content($modinfo->get_cm($cmid)->name).'</NAME>'."\n";
-                $content .= '      <VALUE>'."\n";
+                $content .= '      </VALUE>'."\n";
             }
         } else {
-            $printedconfig = true;
-            $content .= '    <CONFIGFIELD>'."\n";
-            $content .= '      <NAME>'.xml_tag_safe_content($name).'</NAME>'."\n";
             $content .= '      <VALUE>'.xml_tag_safe_content($value).'</VALUE>'."\n";
         }
-        if ($printedconfig==true) {
-            $content .= '    </CONFIGFIELD>'."\n";
-        }
+        $content .= '    </CONFIGFIELD>'."\n";
     }
 
     $content .= '  </CONFIGFIELDS>'."\n";
