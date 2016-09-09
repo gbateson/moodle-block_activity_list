@@ -92,36 +92,44 @@ class block_activity_list_import_form extends moodleform {
         $i = 0;
         while (isset($configfield[$i]['#'])) {
 
-            $name = $configfield[$i]['#']['NAME'][0]['#'];
-            $value = $configfield[$i]['#']['VALUE'][0]['#'];
+            if (isset($configfield[$i]['#']['NAME'][0]['#'])) {
+                $name = $configfield[$i]['#']['NAME'][0]['#'];
 
-            // special processing for list of $cmids
-            if (preg_match('/^cmids[0-9]+/', $name)) {
-                if ($modinfo===null) {
-                    $modinfo = get_fast_modinfo($course);
-                }
-                $cmids = array();
-                $ii = 0;
-                while (isset($value['SECTIONNUM'][$ii]['#'])) {
-                    foreach ($modinfo->cms as $cm) {
-                        if ($cm->sectionnum != $value['SECTIONNUM'][$ii]['#']) {
-                            continue; // wrong section
+                if (isset($configfield[$i]['#']['VALUE'][0]['#'])) {
+                    $value = $configfield[$i]['#']['VALUE'][0]['#'];
+
+
+                    // special processing for list of $cmids
+                    if (preg_match('/^cmids[0-9]+/', $name)) {
+                        if ($modinfo===null) {
+                            $modinfo = get_fast_modinfo($course);
                         }
-                        if ($cm->modname != $value['MODNAME'][$ii]['#']) {
-                            continue; // wrong activity type
+                        $cmids = array();
+                        $ii = 0;
+                        while (isset($value['SECTIONNUM'][$ii]['#'])) {
+                            foreach ($modinfo->cms as $cm) {
+                                if ($cm->sectionnum != $value['SECTIONNUM'][$ii]['#']) {
+                                    continue; // wrong section
+                                }
+                                if ($cm->modname != $value['MODNAME'][$ii]['#']) {
+                                    continue; // wrong activity type
+                                }
+                                if ($cm->name != $value['NAME'][$ii]['#']) {
+                                    continue; // wrong name
+                                }
+                                // same course section number, activity type and activity name
+                                $cmids[] = $cm->id;
+                                break;
+                            }
+                            $ii++;
                         }
-                        if ($cm->name != $value['NAME'][$ii]['#']) {
-                            continue; // wrong name
-                        }
-                        // same course section number, activity type and activity name
-                        $cmids[] = $cm->id;
-                        break;
+                        $value = implode(',', $cmids);
                     }
-                    $ii++;
+                    $config->$name = $value;
+                } else {
+                    unset($config->$name);
                 }
-                $value = implode(',', $cmids);
             }
-            $config->$name = $value;
             $i++;
         }
 
