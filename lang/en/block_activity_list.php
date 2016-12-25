@@ -28,6 +28,17 @@ $string['exclude'] = 'Exclude';
 $string['exportsettings'] = 'Export settings';
 $string['exportsettings_help'] = 'This link allows you export the configuration settings for this block to a file that you can import into a similar block in another course.';
 $string['head'] = 'Head';
+$string['ignorecase'] = 'Ignore upper/lower case';
+$string['ignorecase_help'] = 'When comparing the prefixes and suffixes of items in this list, this setting specifies whether to ignore or detect differences between upper and lowercase letters.
+
+**Yes**
+: differences between upper and lowercase letters will be ignored
+
+**No**
+: differences between upper and lowercase letters will be detected';
+
+$string['ignorechars'] = 'Ignore these characters';
+$string['ignorechars_help'] = 'Any characters specified here will be removed from the text of each item in this list.';
 $string['importsettings'] = 'Import settings';
 $string['importsettings_help'] = 'This link takes you to a screen where you can import configuration settings from a configuration settings file exported from the same type of block in another course.';
 $string['include'] = 'Include';
@@ -44,6 +55,7 @@ $string['listcount'] = 'Number of lists';
 $string['listcount_help'] = 'This setting specifies how many lists will appear in this block. The maximum number of lists is five.';
 $string['listtitle'] = 'List title';
 $string['listtitle_help'] = 'This string will be displayed as the title for this list. If this field is blank, no title will be displayed for this list.';
+$string['long'] = 'Long';
 $string['modname'] = 'Activity type filter';
 $string['modname_help'] = 'This setting specifies which type of activities are to be included in the activity list. Only activity types that occur in this course are included in the list.';
 $string['mycourses'] = 'My courses';
@@ -76,6 +88,25 @@ $string['params_help'] = 'Any parameters specified here will be added to the lin
 The parameters are specified as: *name=value*. If there are several parameters, they should be joined with an ampersand, &quot;&amp;&quot;, like this:
 
 * *name1=value1&amp;name2=value2&amp;name3=value3*';
+$string['prefixchars'] = 'Prefix delimiters';
+$string['prefixchars_help'] = 'If any characters are specified here, they will be used to detect the end of the prefix.
+
+: For a "short" prefix, the prefix ends at the **first** of these characters that is detected.
+: For a "long" prefix, the prefix ends at the **last** of these characters that is detected.';
+$string['prefixkeep'] = 'Keep or remove prefix';
+$string['prefixkeep_help'] = '**Remove**
+: the prefix will be removed and the rest of the name or title will be kept
+
+**Keep**
+: the prefix will be kept and the rest of the name or title will be removed';
+$string['prefixlength'] = 'Fixed prefix length';
+$string['prefixlength_help'] = 'This setting specifies the number of characters in a fixed-length prefix.';
+$string['prefixlong'] = 'Long or short prefix';
+$string['prefixlong_help'] = '**Short**
+: the shortest possible prefix will be used
+
+**Long**
+: the longest prefix will be used';
 $string['replace'] = 'Replace';
 $string['save'] = 'Save';
 $string['search'] = 'Search';
@@ -92,6 +123,13 @@ To copy these settings to blocks in other Moodle sites, use the "export" functio
 $string['separator'] = 'Separator';
 $string['separator_help'] = 'If specified, this text or html is inserted between each list displayed in this block. However, the separator will not be inserted before lists that have a title.';
 $string['settingsmenu'] = 'Settings menu';
+$string['short'] = 'Short';
+$string['shortentext'] = 'Shorten item text';
+$string['shortentext_help'] = '**Yes**
+: if the text every of list item shares a common prefix with the list title, then the prefix will be removed from each item
+
+**No**
+: the text of every item on the list will be displayed in this block';
 $string['sort'] = 'Sort method';
 $string['sort_help'] = 'This settting specifies how the items in the activity list are to be sorted.
 
@@ -126,6 +164,25 @@ $string['special_help'] ='These checkboxes allow you to easily add links to the 
 
 **Front Page**
 : the front page of this Moodle site - also known as the &quot;site page&quot;';
+$string['suffixchars'] = 'Suffix delimiters';
+$string['suffixchars_help'] = 'If any characters are specified here, they will be used to detect the beginning of the suffix.
+
+For a "short" suffix, the suffix starts at the **last** of these characters that is detected.
+For a "long" suffix, the suffix starts at the **first** of these characters that is detected.';
+$string['suffixkeep'] = 'Keep or remove suffix';
+$string['suffixkeep_help'] = '**Remove**
+: the suffix will be removed and the rest of the name or title will be kept
+
+**Keep**
+: the suffix will be kept and the rest of the name or title will be removed';
+$string['suffixlength'] = 'Fixed suffix length';
+$string['suffixlength_help'] = 'This setting specifies the number of characters in a fixed-length suffix.';
+$string['suffixlong'] = 'Long or short suffix';
+$string['suffixlong_help'] = '**Short**
+: the shortest possible suffix will be used
+
+**Long**
+: the longest suffix will be used';
 $string['tail'] = 'Tail';
 $string['text'] = 'Text';
 $string['text_help'] = 'Any text entered here will be added below the list title and above the list of links.';

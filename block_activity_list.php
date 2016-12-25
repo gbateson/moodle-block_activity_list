@@ -116,6 +116,18 @@ class block_activity_list extends block_base {
             $defaults['sort'.$i]    = 0;  // 0=none (i.e course page order), 1=original name, 2=filtered name
             $defaults['params'.$i]  = ''; // e.g. mode=cat
             $defaults['special'.$i] = ''; // 0=none, 1=grades, 2=participants, 4=calendar, 8=site page, 16=my moodle
+
+            $defaults['shortentext'.$i]  = 0;  // 0=original length, 1=shorten, if possible
+            $defaults['ignorecase'.$i]   = 0;  // 0=case insensitive, 1=case sensitive
+            $defaults['ignorechars'.$i]  = ''; // remove these chars
+            $defaults['prefixlength'.$i] = 0;  // fixed length prefix
+            $defaults['prefixchars'.$i]  = ''; // chars which mark the end of the prefix
+            $defaults['prefixlong'.$i]   = 0;  // 0=short as possible, 1=long as possible
+            $defaults['prefixkeep'.$i]   = 0;  // 0=remove, 1=keep
+            $defaults['suffixlength'.$i] = 0;  // fixed length suffix
+            $defaults['suffixchars'.$i]  = ''; // chars which mark the start of the suffix
+            $defaults['suffixlong'.$i]   = 0;  // 0=short as possible, 1=long as possible
+            $defaults['suffixkeep'.$i]   = 0;  // 0=remove, 1=keep
         }
 
         if (! isset($this->config)) {
@@ -158,6 +170,15 @@ class block_activity_list extends block_base {
             $config->$name = $min;
         }
 
+        // remove all individually selected cmids, if required
+        for ($i=0; $i<$config->listcount; $i++) {
+            $name = 'cmids'.$i;
+            $config_name = 'config_'.$name;
+            if (empty($_POST[$config_name])) {
+                $config->$name = array();
+            }
+        }
+
         // selected fields to be copied to other occurrences of this block
         $selected = array();
 
@@ -187,8 +208,12 @@ class block_activity_list extends block_base {
         // multiple occurrence fields (one per list)
         $names = array(
             'listtitle', 'text', 'modname', 'namefilter', 'cmids',
+            'shortentext', 'ignorecase', 'ignorechars',
+            'prefixlength', 'prefixchars', 'prefixlong', 'prefixkeep',
+            'suffixlength', 'suffixchars', 'suffixlong', 'suffixkeep',
             'namedisplay', 'sort', 'params', 'index', 'special',
         );
+
 
         // reduce arrays: cmids, index, special
         for ($i=0; $i<$config->listcount; $i++) {
@@ -313,12 +338,15 @@ class block_activity_list extends block_base {
             return $this->content; // shouldn't happen !!
         }
 
+        // cache the URL of the current page
+        $pageurl = $PAGE->url->out();
+
         // get modinfo (used to find out which section each mod is in)
         $modinfo = get_fast_modinfo($COURSE, $USER->id);
 
         $lists = array();
         for ($i=0; $i<$this->config->listcount; $i++) {
-            $title   = 'title'.$i;
+            $title   = 'listtitle'.$i;
             $text    = 'text'.$i;
             $cmids   = 'cmids'.$i;
             $index   = 'index'.$i;
@@ -332,6 +360,12 @@ class block_activity_list extends block_base {
             $sort    = 'sort'.$i;
             $params  = 'params'.$i;
             $special = 'special'.$i;
+
+            $shortentext = 'shortentext'.$i;
+            $shortentext = $this->config->$shortentext;
+
+            $ignorecase  = 'ignorecase'.$i;
+            $ignorecase = $this->config->$ignorecase;
 
             $cmids_array = explode(',', $this->config->$cmids);
             $cmids_array = array_filter($cmids_array); // remove blanks
@@ -375,6 +409,7 @@ class block_activity_list extends block_base {
             }
 
             if ($this->config->$cmids || $this->config->$modname) {
+
                 foreach ($modinfo->cms as $cmid => $cm) {
                     if ($cm->modname=='label') {
                         continue; // always skip labels
@@ -402,20 +437,6 @@ class block_activity_list extends block_base {
                     if ($add) {
                         // format activity display name
                         $originalname = strip_tags(self::filter_text($cm->name));
-                        $displayname = $originalname;
-
-                        if ($this->config->$search) {
-                            $searchstring = '/'.$this->config->$search.'/';
-                            if ($this->config->$case) {
-                                $searchstring .= 'i';
-                            }
-                            if (empty($this->config->$limit)) {
-                                $limit = -1; // no limit
-                            } else {
-                                $limit = $this->config->$limit;
-                            }
-                            $displayname = preg_replace($searchstring, $this->config->$replace, $displayname, $limit);
-                        }
 
                         // format link to this activity
                         $href = $CFG->wwwroot.'/mod/'.$cm->modname.'/view.php?id='.$cm->id;
@@ -426,11 +447,51 @@ class block_activity_list extends block_base {
                         // add this activity to the current activity list
                         $list->items[] = (object)array(
                             'originalname' => $originalname,
-                            'displayname'  => $displayname,
+                            'displayname'  => $originalname,
                             'href'         => $href,
                             'icon'         => $PAGE->theme->pix_url('icon', $cm->modname)->out()
                         );
                     }
+                }
+
+                $prefixlen = null;
+                $suffixlen = null;
+
+                // remove common prefixes and suffixes from item names
+                if ($shortentext) {
+                    foreach ($list->items as $item) {
+                        $len = self::count_matching_chars($item->originalname, $list->title, true, $ignorecase);
+                        if (is_null($prefixlen) || $len < $prefixlen) {
+                            $prefixlen = $len;
+                        }
+                        $len = self::count_matching_chars($item->originalname, $list->title, false, $ignorecase);
+                        if (is_null($suffixlen) || $len < $suffixlen) {
+                            $suffixlen = $len;
+                        }
+                    }
+                }
+
+                // format the display names
+                foreach ($list->items as $ii => $item) {
+                    $displayname = $item->displayname;
+
+                    if ($this->config->$search) {
+                        $searchstring = '/'.$this->config->$search.'/';
+                        if ($this->config->$case) {
+                            $searchstring .= 'i';
+                        }
+                        if (empty($this->config->$limit)) {
+                            $limit = -1; // no limit
+                        } else {
+                            $limit = $this->config->$limit;
+                        }
+                        $displayname = preg_replace($searchstring, $this->config->$replace, $displayname, $limit);
+                    }
+
+                    // fix the prefixes and suffixes, if necessary
+                    $displayname = $this->fix_prefix_suffix($displayname, $i, $prefixlen, $suffixlen);
+
+                    $list->items[$ii]->displayname = $displayname;
                 }
             }
 
@@ -548,9 +609,15 @@ class block_activity_list extends block_base {
                         if (empty($item->icon)) {
                             $icon = '';
                         } else {
-                            $icon = '<img src="'.$item->icon.'" class="icon" />';
+                            $icon = '<img src="'.$item->icon.'" class="icon" /> ';
                         }
-                        $list->items[$ii] = '<li><a href="'.$item->href.'" title="'.s($item->originalname).'">'.$icon.' '.$this->trim_name($item->displayname).'</a></li>';
+                        $icon .= $this->trim_name($item->displayname);
+                        if ($item->href==$pageurl) {
+                            $icon = '<b class="currentpage" title="'.s($item->originalname).'">'.$icon.'</b>';
+                        } else {
+                            $icon = '<a href="'.$item->href.'" title="'.s($item->originalname).'">'.$icon.'</a>';
+                        }
+                        $list->items[$ii] = '<li>'.$icon.'</li>';
                     }
                     $lists[$i] .= '<ul>'."\n".implode("\n", $list->items)."\n".'</ul>';
                 }
@@ -562,6 +629,116 @@ class block_activity_list extends block_base {
         }
 
         return $this->content;
+    }
+
+    /**
+     * fix_prefix_suffix
+     *
+     * @param xxx $text
+     * @param xxx $i the list number
+     * @param xxx $prefixlen (optional, default=0) length of prefix that matches parent and sibling records
+     * @param xxx $suffixlen (optional, default=0) length of suffix that matches parent and sibling records
+     * @return xxx
+     */
+    function fix_prefix_suffix($text, $i, $prefixlen=0, $suffixlen=0) {
+        static $search = null;
+        static $replace = null;
+
+        // set up $search and $replace (first time only)
+        if (is_null($search)) {
+            $search = array();
+            $replace = array();
+        }
+
+        $prefixkeep   = 'prefixkeep'.$i;
+        $suffixkeep   = 'suffixkeep'.$i;
+
+        // set up $search[$i] and $replace[$i] (first time only)
+        if (! array_key_exists($i, $search)) {
+
+            $search[$i] = array();
+            $replace[$i] = array();
+
+            $prefixchars  = 'prefixchars'.$i;
+            $prefixlong   = 'prefixlong'.$i;
+
+            if ($chars = $this->config->$prefixchars) {
+                $chars = implode('|', array_map('preg_quote', self::str_split($chars), array('/')));
+                if ($this->config->$prefixlong) {
+                    array_push($search[$i], "/^(.*)($chars)(.*?)$/u");
+                } else {
+                    array_push($search[$i], "/^(.*?)($chars)(.*)$/u");
+                }
+                if ($this->config->$prefixkeep) {
+                    array_push($replace[$i], '$1');
+                } else {
+                    array_push($replace[$i], '$3');
+                }
+            }
+
+            $suffixchars  = 'suffixchars'.$i;
+            $suffixlong   = 'suffixlong'.$i;
+
+            if ($chars = $this->config->$suffixchars) {
+                $chars = implode('|', array_map('preg_quote', self::str_split($chars), array('/')));
+                if ($this->config->$suffixlong) {
+                    array_push($search[$i], "/^(.*?)($chars)(.*)$/u");
+                } else {
+                    array_push($search[$i], "/^(.*)($chars)(.*?)$/u");
+                }
+                if ($this->config->$suffixkeep) {
+                    array_push($replace[$i], '$3');
+                } else {
+                    array_push($replace[$i], '$1');
+                }
+            }
+
+            $ignorechars = 'ignorechars'.$i;
+            if ($chars = $this->config->$ignorechars) {
+                $chars = implode('|', array_map('preg_quote', self::str_split($chars), array('/')));
+                array_push($search[$i], "/$chars/u");
+                array_push($replace[$i], '');
+            }
+
+            if (empty($search[$i])) {
+                $search[$i] = false;
+                $replace[$i] = false;
+            }
+        }
+
+        $prefixlength = 'prefixlength'.$i;
+        if ($this->config->$prefixlength) {
+            $prefixlen = $this->config->$prefixlength;
+        }
+
+        $suffixlength = 'suffixlength'.$i;
+        if ($this->config->$suffixlength) {
+            $suffixlen = $this->config->$suffixlength;
+        }
+
+        if ($prefixlen) {
+            if ($this->config->$prefixkeep) {
+                $text = self::textlib('substr', $text, 0, $prefixlen);
+            } else {
+                $len = self::textlib('strlen', $text) - $prefixlen;
+                $text = self::textlib('substr', $text, $prefixlen, $len);
+            }
+        }
+
+        if ($suffixlen) {
+            $len = self::textlib('strlen', $text) - $suffixlen;
+            if ($this->config->$suffixkeep) {
+                $text = self::textlib('substr', $text, $len, $suffixlen);
+            } else {
+                $text = self::textlib('substr', $text, 0, $len);
+            }
+        }
+
+        if ($search[$i]) {
+            $text = preg_replace($search[$i], $replace[$i], $text);
+        }
+
+        return $text;
     }
 
     /**
@@ -635,7 +812,7 @@ class block_activity_list extends block_base {
 
         $strlen = self::textlib('strlen', $name);
 
-        if ($strlen > $namelength) {
+        if ($namelength && $namelength < $strlen) {
             $head = self::textlib('substr', $name, 0, $headlength);
             $tail = self::textlib('substr', $name, $strlen - $taillength, $taillength);
             $name = $head.' ... '.$tail;
@@ -793,26 +970,83 @@ class block_activity_list extends block_base {
     }
 
     /**
-     * context
+     * count_matching_chars
      *
-     * a wrapper method to offer consistent API to get contexts
-     * in Moodle 2.0 and 2.1, we use self::context() function
-     * in Moodle >= 2.2, we use static context_xxx::instance() method
-     *
-     * @param integer $contextlevel
-     * @param integer $instanceid (optional, default=0)
-     * @param int $strictness (optional, default=0 i.e. IGNORE_MISSING)
-     * @return required context
-     * @todo Finish documenting this function
+     * @param $a string
+     * @param $b string
+     * @param $forward bool start from the beginning (true) or end (false) of the string
+     * @param $ignorecase bool (optional, default=false) ignore (true) or detect (false) differences in case
+     * @return int
      */
-    static public function context($contextlevel, $instanceid=0, $strictness=0) {
-        if (class_exists('context_helper')) {
-            // use call_user_func() to prevent syntax error in PHP 5.2.x
-            $class = context_helper::get_class_for_level($contextlevel);
-            return call_user_func(array($class, 'instance'), $instanceid, $strictness);
-        } else {
-            return get_context_instance($contextlevel, $instanceid);
+    static public function count_matching_chars($a, $b, $forward, $ignorecase=false) {
+
+        $a_len = self::textlib('strlen', $a);
+        if ($a_len==0) {
+            return 0;
         }
+
+        $b_len = self::textlib('strlen', $b);
+        if ($b_len==0) {
+            return 0;
+        }
+
+        if ($ignorecase) {
+            $a = self::textlib('strtoupper', $a);
+            $b = self::textlib('strtoupper', $b);
+        }
+
+        if ($a_len==$b_len && $a==$b) {
+            return $a_len;
+        }
+
+        $i = 0;
+        $i_max = min($a_len, $b_len);
+
+        if ($forward) {
+            while ($i<$i_max && self::textlib('substr', $a, $i, 1)==self::textlib('substr', $b, $i, 1)) {
+                $i++;
+            }
+        } else {
+            while ($i<$i_max && self::textlib('substr', $a, ($a_len - $i - 1), 1)==self::textlib('substr', $b, ($b_len - $i - 1), 1)) {
+                $i++;
+            }
+        }
+        return $i;
+    }
+
+    /**
+     * str_split
+     *
+     * @param xxx $str
+     * @param xxx $split_length (optional, default=1)
+     * @return xxx
+     */
+    static public function str_split($str, $split_length=1){
+        $array = array();
+        $i_max = self::textlib('strlen', $str);
+        for($i=0; $i<$i_max; $i+=$split_length){
+            $array[] = self::textlib('substr', $str, $i, $split_length);
+        }
+        return $array;
+    }
+
+    /**
+     * filter_text
+     *
+     * @param string $text
+     * @return string
+     */
+    static public function filter_text($text) {
+        global $COURSE, $PAGE;
+
+        $filter = filter_manager::instance();
+
+        if (method_exists($filter, 'setup_page_for_filters')) {
+            // Moodle >= 2.3
+            $filter->setup_page_for_filters($PAGE, $PAGE->context);
+        }
+
+        return $filter->filter_text($text, $PAGE->context);
     }
 
     /**
@@ -874,21 +1108,25 @@ class block_activity_list extends block_base {
     }
 
     /**
-     * filter_text
+     * context
      *
-     * @param string $text
-     * @return string
+     * a wrapper method to offer consistent API to get contexts
+     * in Moodle 2.0 and 2.1, we use self::context() function
+     * in Moodle >= 2.2, we use static context_xxx::instance() method
+     *
+     * @param integer $contextlevel
+     * @param integer $instanceid (optional, default=0)
+     * @param int $strictness (optional, default=0 i.e. IGNORE_MISSING)
+     * @return required context
+     * @todo Finish documenting this function
      */
-    static public function filter_text($text) {
-        global $COURSE, $PAGE;
-
-        $filter = filter_manager::instance();
-
-        if (method_exists($filter, 'setup_page_for_filters')) {
-            // Moodle >= 2.3
-            $filter->setup_page_for_filters($PAGE, $PAGE->context);
+    static public function context($contextlevel, $instanceid=0, $strictness=0) {
+        if (class_exists('context_helper')) {
+            // use call_user_func() to prevent syntax error in PHP 5.2.x
+            $class = context_helper::get_class_for_level($contextlevel);
+            return call_user_func(array($class, 'instance'), $instanceid, $strictness);
+        } else {
+            return get_context_instance($contextlevel, $instanceid);
         }
-
-        return $filter->filter_text($text, $PAGE->context);
     }
 }

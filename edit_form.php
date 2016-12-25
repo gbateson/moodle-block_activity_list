@@ -153,7 +153,7 @@ class block_activity_list_edit_form extends block_edit_form {
 
             $name = 'modname';
             $config_name = 'config_'.$name.$i;
-            $options = array('0' => get_string('none')) + $this->modnames;
+            $options = array('' => get_string('none')) + $this->modnames;
             $mform->addElement('select', $config_name, get_string($name, $plugin), $options);
             $mform->setType($config_name, PARAM_PLUGIN);
             $mform->setDefault($config_name, $this->defaultvalue($name.$i));
@@ -439,6 +439,107 @@ class block_activity_list_edit_form extends block_edit_form {
      * @return void, but will modify $mform
      */
     protected function add_field_namedisplay($mform, $plugin, $i) {
+
+        $textoptions = array('size' => 15);
+        $lengthoptions = range(0, 20);
+        $longoptions = array(
+            0 => get_string('short', $plugin),
+            1 => get_string('long', $plugin)
+        );
+        $keepoptions = array(
+            0 => get_string('remove'),
+            1 => get_string('keep')
+        );
+
+
+        $name = 'shortentext';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('selectyesno', $config_name, $label);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, 0);
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'ignorecase';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('selectyesno', $config_name, $label);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, 0);
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'ignorechars';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('text', $config_name, $label, $textoptions);
+        $mform->setType($config_name, PARAM_TEXT);
+        $mform->setDefault($config_name, '');
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'prefixlength';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('select', $config_name, $label, $lengthoptions);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, 0);
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'prefixchars';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('text', $config_name, $label, $textoptions);
+        $mform->setType($config_name, PARAM_TEXT);
+        $mform->setDefault($config_name, '');
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'prefixlong';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('select', $config_name, $label, $longoptions);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, 0);
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'prefixkeep';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('select', $config_name, $label, $keepoptions);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, 0);
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'suffixlength';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('select', $config_name, $label, $lengthoptions);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, 0);
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'suffixchars';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('text', $config_name, $label, $textoptions);
+        $mform->setType($config_name, PARAM_TEXT);
+        $mform->setDefault($config_name, '');
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'suffixlong';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('select', $config_name, $label, $longoptions);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, 0);
+        $mform->addHelpButton($config_name, $name, $plugin);
+
+        $name = 'suffixkeep';
+        $config_name = 'config_'.$name.$i;
+        $label = get_string($name, $plugin);
+        $mform->addElement('select', $config_name, $label, $keepoptions);
+        $mform->setType($config_name, PARAM_INT);
+        $mform->setDefault($config_name, 0);
+        $mform->addHelpButton($config_name, $name, $plugin);
+
         $elements = array();
 
         $name = 'search';
