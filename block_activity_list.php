@@ -374,10 +374,10 @@ class block_activity_list extends block_base {
             $index_array = array_filter($index_array); // remove blanks
 
             $list = (object)array(
-                'title' => self::filter_text($this->config->$title),
-                'text' => self::filter_text($this->config->$text),
-                'items' => array(),
-                'indexes' => array(),
+                'title'    => (property_exists($this->config, $title) ? self::filter_text($this->config->$title) : ''),
+                'text'     => (property_exists($this->config, $text)  ? self::filter_text($this->config->$text)  : ''),
+                'items'    => array(),
+                'indexes'  => array(),
                 'specials' => array(),
             );
 
