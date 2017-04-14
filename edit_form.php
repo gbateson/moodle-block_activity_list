@@ -227,15 +227,22 @@ class block_activity_list_edit_form extends block_edit_form {
         $label = get_string($name);
         $text = get_string('block'.$name, $plugin);
 
+        if (isset($this->block->instance)) {
+            $blockname = $this->block->instance->blockname;
+        } else {
+            // strip "block_" prefix and "_edit_form" suffix
+            $blockname = substr(get_class($this), 6, -10);
+        }
+
         $params = array('id' => $this->block->instance->id);
-        $params = array('href' => new moodle_url('/blocks/maj_submissions/export.php', $params));
+        $params = array('href' => new moodle_url('/blocks/'.$blockname.'/export.php', $params));
 
         $text .= html_writer::empty_tag('br');
         $text .= html_writer::tag('a', get_string('exportsettings', $plugin), $params);
         $text .= ' '.$OUTPUT->help_icon('exportsettings', $plugin);
 
         $params = array('id' => $this->block->instance->id);
-        $params = array('href' => new moodle_url('/blocks/maj_submissions/import.php', $params));
+        $params = array('href' => new moodle_url('/blocks/'.$blockname.'/import.php', $params));
 
         $text .= html_writer::empty_tag('br');
         $text .= html_writer::tag('a', get_string('importsettings', $plugin), $params);
