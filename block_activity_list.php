@@ -341,6 +341,13 @@ class block_activity_list extends block_base {
         // cache the URL of the current page
         $pageurl = $PAGE->url->out();
 
+        // cache the method name used to generate image URLs
+        if (method_exists($PAGE->theme, 'image_url')) {
+            $image_url = 'image_url'; // Moodle >= 3.3
+        } else {
+            $image_url = 'pix_url'; // Moodle <= 3.2
+        }
+
         // get modinfo (used to find out which section each mod is in)
         $modinfo = get_fast_modinfo($COURSE, $USER->id);
 
@@ -400,7 +407,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $CFG->wwwroot.'/mod/'.$cm->modname.'/index.php?id='.$COURSE->id,
-                        'icon'         => $PAGE->theme->pix_url('icon', $cm->modname)->out()
+                        'icon'         => $PAGE->theme->$image_url('icon', $cm->modname)->out()
                     );
 
                     // remove this $cm->modname, so it only appears once in the list
@@ -449,7 +456,7 @@ class block_activity_list extends block_base {
                             'originalname' => $originalname,
                             'displayname'  => $originalname,
                             'href'         => $href,
-                            'icon'         => $PAGE->theme->pix_url('icon', $cm->modname)->out()
+                            'icon'         => $PAGE->theme->$image_url('icon', $cm->modname)->out()
                         );
                     }
                 }
@@ -515,7 +522,7 @@ class block_activity_list extends block_base {
                             'originalname' => $originalname,
                             'displayname'  => $originalname,
                             'href'         => $CFG->wwwroot.'/grade/report/index.php?id='.$COURSE->id,
-                            'icon'         => $PAGE->theme->pix_url('i/grades', 'core')->out()
+                            'icon'         => $PAGE->theme->$image_url('i/grades', 'core')->out()
                         );
                     }
                 }
@@ -526,7 +533,7 @@ class block_activity_list extends block_base {
                             'originalname' => $originalname,
                             'displayname'  => $originalname,
                             'href'         => $CFG->wwwroot.'/user/index.php?id='.$COURSE->id,
-                            'icon'         => $PAGE->theme->pix_url('i/users', 'core')->out()
+                            'icon'         => $PAGE->theme->$image_url('i/users', 'core')->out()
                         );
                     }
                 }
@@ -538,7 +545,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $href,
-                        'icon'         => $PAGE->theme->pix_url('t/calendar', 'core')->out()
+                        'icon'         => $PAGE->theme->$image_url('t/calendar', 'core')->out()
                     );
                 }
                 if ($this->config->$special & self::SPECIAL_COURSES) {
@@ -547,7 +554,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $CFG->wwwroot.'/course/index.php',
-                        'icon'         => $PAGE->theme->pix_url('i/course', 'core')->out()
+                        'icon'         => $PAGE->theme->$image_url('i/course', 'core')->out()
                     );
                 }
                 if ($this->config->$special & self::SPECIAL_SITEPAGE) {
@@ -556,7 +563,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $CFG->wwwroot.'/course/view.php?id='.SITEID,
-                        'icon'         => $PAGE->theme->pix_url('i/siteevent', 'core')->out()
+                        'icon'         => $PAGE->theme->$image_url('i/siteevent', 'core')->out()
                     );
                 }
                 if ($this->config->$special & self::SPECIAL_MYMOODLE) {
@@ -565,7 +572,7 @@ class block_activity_list extends block_base {
                         'originalname' => $originalname,
                         'displayname'  => $originalname,
                         'href'         => $CFG->wwwroot.'/my/',
-                        'icon'         => $PAGE->theme->pix_url('i/moodle_host', 'core')->out()
+                        'icon'         => $PAGE->theme->$image_url('i/moodle_host', 'core')->out()
                     );
                 }
             }
