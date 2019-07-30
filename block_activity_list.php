@@ -133,6 +133,11 @@ class block_activity_list extends block_base {
         if (! isset($this->config)) {
             $this->config = new stdClass();
         }
+        if (get_class($this->config)=='__PHP_Incomplete_Class') {
+            $this->config = get_object_vars($this->config);
+            $this->config = (object)$this->config;
+            unset($this->config->__PHP_Incomplete_Class_Name);
+        }
         foreach ($defaults as $name => $value) {
             if (! isset($this->config->$name)) {
                 $this->config->$name = $value;
