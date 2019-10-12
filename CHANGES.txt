@@ -1,0 +1,82 @@
+========================================
+Change log for block_activity_list
+========================================
+
+2019-08-09 (13)
+ -  Fix errors about incomplete object, caused by class not existing before unserialize 
+
+2019-07-30 (12)
+ -  Fix errors about incomplete object, caused by class not existing before unserialize 
+
+2019-07-30 (12)
+ -  Fix errors about incomplete object, caused by class not existing before unserialize 
+
+2018-07-04 (11)
+ -  block/activity_list replace deprecated pix_url with image_url in Moodle >= 3.3 
+
+2017-04-14 (10)
+ -  fix import/export URLs to use correct blockname instead of hard-coded 'maj_submissions' 
+
+2017-02-22 (09)
+ -  fix undefined property  
+
+2016-12-25 (08)
+ -  finish new settings to detect and remove prefixes and suffixes from display names 
+
+2016-09-19 (07)
+ -  add new settings to keep/remove prefixes and suffixes of list items 
+
+2016-09-19 (07)
+ -  fix small typing mistake when getting list of languages 
+
+2016-09-09 (06)
+ -  use moodleform style form in import script 
+
+2016-09-09 (06)
+ -  use standard moodleform in import/export scripts 
+
+2016-09-09 (05)
+ -  use standard moodleform in import/export scripts 
+
+2015-10-08 (04)
+ -  block/activity_list replace references to "quizport" by "taskchain", and references to "taskchain_navigation" to "activity_list" 
+
+2015-09-09 (03)
+ -  blocks/activity_list standardize format of release string in version.php 
+
+2015.09.09 (03)
+ -  block/activity_list add 'component' and 'maturity' settings to version.php 
+
+2014.12.16 (02)
+ -  block/activity_list add missing capability string for 'addinstance' 
+
+2014.08.12 (01)
+ -  block/activity_list fix context errors 
+
+2014.08.12 (01)
+ -  block/activity_list fix transfer of settings ot similar blocks in other courses 
+
+2014.08.12 (01)
+ -  block/activity_list fix transfer of settings ot similar blocks in other courses 
+
+2014.07.01 (00)
+ -  blocks/activity_list fix select_ checkbox names on edit_form 
+
+2014.07.01 (00)
+ -  block/activity_list remove obsolete config_instance.html 
+
+2014.07.01 (00)
+ -  block/activity_list fix saving of new config settings 
+
+2014.07.01 (00)
+ -  block/activity_list start adding fields to edit_form 
+
+2014.07.01 (00)
+ -  block/activity_list fix display of activity_list block on course page 
+
+2014.07.01 (00)
+ -  block/activity_list add API for context and filter_text 
+
+2014.07.01 (00)
+ -  blocks/activity_list create and populate initial version of activity_list 
+ -  moodle.2x add folders for new blocks: activity_list, taskchain_navigation, ungraded_actvities 
