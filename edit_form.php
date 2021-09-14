@@ -691,6 +691,9 @@ class block_activity_list_edit_form extends block_edit_form {
         $mform->addHelpButton($elements_name, $name, $plugin);
 
         $defaultvalue = $this->defaultvalue($name.$i);
+        if ($defaultvalue == null || $defaultvalue == '') {
+            $defaultvalue = 0;
+        }
 
         foreach ($specials as $special => $text) {
             $mform->setType($config_name.'['.$special.']', PARAM_INT);

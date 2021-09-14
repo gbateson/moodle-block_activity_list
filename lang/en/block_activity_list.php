@@ -31,11 +31,11 @@ $string['head'] = 'Head';
 $string['ignorecase'] = 'Ignore upper/lower case';
 $string['ignorecase_help'] = 'When comparing the prefixes and suffixes of items in this list, this setting specifies whether to ignore or detect differences between upper and lowercase letters.
 
-**Yes**
-: differences between upper and lowercase letters will be ignored
+**Yes**  
+&nbsp; differences between upper and lowercase letters will be ignored
 
-**No**
-: differences between upper and lowercase letters will be detected';
+**No**  
+&nbsp; differences between upper and lowercase letters will be detected';
 
 $string['ignorechars'] = 'Ignore these characters';
 $string['ignorechars_help'] = 'Any characters specified here will be removed from the text of each item in this list.';
@@ -91,22 +91,22 @@ The parameters are specified as: *name=value*. If there are several parameters, 
 $string['prefixchars'] = 'Prefix delimiters';
 $string['prefixchars_help'] = 'If any characters are specified here, they will be used to detect the end of the prefix.
 
-: For a "short" prefix, the prefix ends at the **first** of these characters that is detected.
-: For a "long" prefix, the prefix ends at the **last** of these characters that is detected.';
+&nbsp; For a "short" prefix, the prefix ends at the **first** of these characters that is detected.
+&nbsp; For a "long" prefix, the prefix ends at the **last** of these characters that is detected.';
 $string['prefixkeep'] = 'Keep or remove prefix';
-$string['prefixkeep_help'] = '**Remove**
-: the prefix will be removed and the rest of the name or title will be kept
+$string['prefixkeep_help'] = '**Remove**  
+&nbsp; the prefix will be removed and the rest of the name or title will be kept
 
-**Keep**
-: the prefix will be kept and the rest of the name or title will be removed';
+**Keep**  
+&nbsp; the prefix will be kept and the rest of the name or title will be removed';
 $string['prefixlength'] = 'Fixed prefix length';
 $string['prefixlength_help'] = 'This setting specifies the number of characters in a fixed-length prefix.';
 $string['prefixlong'] = 'Long or short prefix';
-$string['prefixlong_help'] = '**Short**
-: the shortest possible prefix will be used
+$string['prefixlong_help'] = '**Short**  
+&nbsp; the shortest possible prefix will be used
 
-**Long**
-: the longest prefix will be used';
+**Long**  
+&nbsp; the longest prefix will be used';
 $string['replace'] = 'Replace';
 $string['save'] = 'Save';
 $string['search'] = 'Search';
@@ -125,64 +125,64 @@ $string['separator_help'] = 'If specified, this text or html is inserted between
 $string['settingsmenu'] = 'Settings menu';
 $string['short'] = 'Short';
 $string['shortentext'] = 'Shorten item text';
-$string['shortentext_help'] = '**Yes**
-: if the text every of list item shares a common prefix with the list title, then the prefix will be removed from each item
+$string['shortentext_help'] = '**Yes**  
+&nbsp; if the text every of list item shares a common prefix with the list title, then the prefix will be removed from each item
 
-**No**
-: the text of every item on the list will be displayed in this block';
+**No**  
+&nbsp; the text of every item on the list will be displayed in this block';
 $string['sort'] = 'Sort method';
 $string['sort_help'] = 'This settting specifies how the items in the activity list are to be sorted.
 
-**Keep same order as course sections**
-: the activities will appear in the same order as they do in the main content column of the course page.
+**Keep same order as course sections**  
+&nbsp; the activities will appear in the same order as they do in the main content column of the course page.
 
-**Sort by original name**
-: the activities will be sorted by the activity names that are used in the main content column of the course page
+**Sort by original name**  
+&nbsp; the activities will be sorted by the activity names that are used in the main content column of the course page
 
-**Sort by display name**
-: the activities will be sorted by the display names, i.e. the activity names after they have been modified by the search and replace strings in the &quot;Name display&quot; settings';
+**Sort by display name**  
+&nbsp; the activities will be sorted by the display names, i.e. the activity names after they have been modified by the search and replace strings in the &quot;Name display&quot; settings';
 $string['sortdisplayname'] = 'Sort by display name';
 $string['sortoriginalname'] = 'Sort by original name';
 $string['sortsectionsequence'] = 'Keep same order as course sections';
 $string['special'] = 'Special Moodle pages';
 $string['special_help'] ='These checkboxes allow you to easily add links to the following special Moodle pages.
 
-**Grades**
-: the grades page for this course
+**Grades**  
+&nbsp; the grades page for this course
 
-**Participants**
-: the participant list, showing the names of students and teachers in this course
+**Participants**  
+&nbsp; the participant list, showing the names of students and teachers in this course
 
-**Calendar**
-: the calendar page for this course
+**Calendar**  
+&nbsp; the calendar page for this course
 
-**Courses**
-: the page showing a list of all courses and course categories on this Moodle site
+**Courses**  
+&nbsp; the page showing a list of all courses and course categories on this Moodle site
 
-**My Moodle**
-: the &quot;My Moodle&quot; page, which shows links to the user\'s courses and activities within them, such as unread forum posts and upcoming assignments
+**My Moodle**  
+&nbsp; the &quot;My Moodle&quot; page, which shows links to the user\'s courses and activities within them, such as unread forum posts and upcoming assignments
 
-**Front Page**
-: the front page of this Moodle site - also known as the &quot;site page&quot;';
+**Front Page**  
+&nbsp; the front page of this Moodle site - also known as the &quot;site page&quot;';
 $string['suffixchars'] = 'Suffix delimiters';
 $string['suffixchars_help'] = 'If any characters are specified here, they will be used to detect the beginning of the suffix.
 
 For a "short" suffix, the suffix starts at the **last** of these characters that is detected.
 For a "long" suffix, the suffix starts at the **first** of these characters that is detected.';
 $string['suffixkeep'] = 'Keep or remove suffix';
-$string['suffixkeep_help'] = '**Remove**
-: the suffix will be removed and the rest of the name or title will be kept
+$string['suffixkeep_help'] = '**Remove**  
+&nbsp; the suffix will be removed and the rest of the name or title will be kept
 
-**Keep**
-: the suffix will be kept and the rest of the name or title will be removed';
+**Keep**  
+&nbsp; the suffix will be kept and the rest of the name or title will be removed';
 $string['suffixlength'] = 'Fixed suffix length';
 $string['suffixlength_help'] = 'This setting specifies the number of characters in a fixed-length suffix.';
 $string['suffixlong'] = 'Long or short suffix';
-$string['suffixlong_help'] = '**Short**
-: the shortest possible suffix will be used
+$string['suffixlong_help'] = '**Short**  
+&nbsp; the shortest possible suffix will be used
 
-**Long**
-: the longest suffix will be used';
+**Long**  
+&nbsp; the longest suffix will be used';
 $string['tail'] = 'Tail';
 $string['text'] = 'Text';
 $string['text_help'] = 'Any text entered here will be added below the list title and above the list of links.';
