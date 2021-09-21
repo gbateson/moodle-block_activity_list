@@ -7,6 +7,18 @@
  * @license    you may not copy of distribute any part of this package without prior written permission
  */
 
+/*
+ * styles for block settings edit form
+ */
+
+#block_activity_list_edit_form {
+    max-width: 1000px;
+}
+
+/*
+ * styles for the activity_list block
+ */
+
 table.blockconfigtable th.blockconfigmenu {
     text-align: left;
     background-color: #eeeeee;

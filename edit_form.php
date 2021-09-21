@@ -48,6 +48,7 @@ class block_activity_list_edit_form extends block_edit_form {
      * @return void, but will update $mform
      */
     protected function specific_definition($mform) {
+        global $PAGE;
 
         $this->set_form_id($mform, get_class($this));
 
@@ -104,7 +105,7 @@ class block_activity_list_edit_form extends block_edit_form {
                 $mform->setDefault($config_name, $this->defaultvalue($name));
                 $mform->addHelpButton($config_name, $name, $plugin);
 
-                $this->add_selectallnone($mform, $plugin);
+                $PAGE->requires->js_call_amd('block_activity_list/form', 'init');
             }
         }
     }
@@ -227,28 +228,19 @@ class block_activity_list_edit_form extends block_edit_form {
         $label = get_string($name);
         $text = get_string('block'.$name, $plugin);
 
-        if (isset($this->block->instance)) {
-            $blockname = $this->block->instance->blockname;
-        } else {
-            // strip "block_" prefix and "_edit_form" suffix
-            $blockname = substr(get_class($this), 6, -10);
-        }
+        $export = get_string('exportsettings', $plugin);
+        $params = array('id' => $this->block->instance->id); // URL params
+        $params = array('href' => new moodle_url('/blocks/activity_list/export.php', $params));
+        $export = html_writer::tag('a', $export, $params).' '.$OUTPUT->help_icon('exportsettings', $plugin);
+        $export = html_writer::tag('div', $export, array('class' => 'exportsettings'));
 
-        $params = array('id' => $this->block->instance->id);
-        $params = array('href' => new moodle_url('/blocks/'.$blockname.'/export.php', $params));
+        $import = get_string('importsettings', $plugin);
+        $params = array('id' => $this->block->instance->id); // URL params
+        $params = array('href' => new moodle_url('/blocks/activity_list/import.php', $params));
+        $import = html_writer::tag('a', $import, $params).' '.$OUTPUT->help_icon('importsettings', $plugin);
+        $import = html_writer::tag('div', $import, array('class' => 'importsettings'));
 
-        $text .= html_writer::empty_tag('br');
-        $text .= html_writer::tag('a', get_string('exportsettings', $plugin), $params);
-        $text .= ' '.$OUTPUT->help_icon('exportsettings', $plugin);
-
-        $params = array('id' => $this->block->instance->id);
-        $params = array('href' => new moodle_url('/blocks/'.$blockname.'/import.php', $params));
-
-        $text .= html_writer::empty_tag('br');
-        $text .= html_writer::tag('a', get_string('importsettings', $plugin), $params);
-        $text .= ' '.$OUTPUT->help_icon('importsettings', $plugin);
-
-        $mform->addElement('static', $name, $label, $text);
+        $mform->addElement('static', $name, $label, $text.$export.$import);
     }
 
     /**
@@ -315,7 +307,7 @@ class block_activity_list_edit_form extends block_edit_form {
 
             // add line break (except before the first language, the default, which has $lang=='')
             if ($lang) {
-                $elements[] = $mform->createElement('static', '', '', html_writer::empty_tag('br'));
+                $elements[] = $this->create_linebreak($mform);
             }
 
             // add length fields for this language
@@ -354,11 +346,13 @@ class block_activity_list_edit_form extends block_edit_form {
         $names = array('include', 'exclude');
         foreach ($names as $name) {
             $config_name = 'config_'.$name.$i;
+            if (count($elements)) {
+                $elements[] = $this->create_linebreak($mform);
+            }
             $elements[] = $mform->createElement('static', '', '', get_string($name, $plugin));
+            $elements[] = $this->create_spacer($mform);
             $elements[] = $mform->createElement('text', $config_name, '', array('size' => 15));
-            $elements[] = $mform->createElement('static', '', '', html_writer::empty_tag('br'));
         }
-        array_pop($elements); // remove last <br />
 
         $name = 'namefilter';
         $elements_name = 'elements_'.$name.$i;
@@ -458,7 +452,6 @@ class block_activity_list_edit_form extends block_edit_form {
             1 => get_string('keep')
         );
 
-
         $name = 'shortentext';
         $config_name = 'config_'.$name.$i;
         $label = get_string($name, $plugin);
@@ -552,6 +545,7 @@ class block_activity_list_edit_form extends block_edit_form {
         $name = 'search';
         $config_name = 'config_'.$name.$i;
         $elements[] = $mform->createElement('static', '', '', get_string($name, $plugin));
+        $elements[] = $this->create_spacer($mform);
         $elements[] = $mform->createElement('text', $config_name, '', array('size' => 15));
 
         $name = 'case';
@@ -561,18 +555,19 @@ class block_activity_list_edit_form extends block_edit_form {
             1 => get_string('casesensitive', $plugin),
         );
         $elements[] = $mform->createElement('select', $config_name, '', $options);
-
-        $elements[] = $mform->createElement('static', '', '', html_writer::empty_tag('br'));
+        $elements[] = $this->create_linebreak($mform);
 
         $name = 'replace';
         $config_name = 'config_'.$name.$i;
         $elements[] = $mform->createElement('static', '', '', get_string($name, $plugin));
+        $elements[] = $this->create_spacer($mform);
         $elements[] = $mform->createElement('text', $config_name, '', array('size' => 15));
 
         $name = 'limit';
         $config_name = 'config_'.$name.$i;
         $options = array_slice(range(0, 5), 1, 5, true);
         $elements[] = $mform->createElement('static', '', '', get_string($name, $plugin));
+        $elements[] = $this->create_spacer($mform);
         $elements[] = $mform->createElement('select', $config_name, '', $options);
 
         $name = 'namedisplay';
@@ -645,10 +640,13 @@ class block_activity_list_edit_form extends block_edit_form {
 
         $elements = array();
         foreach ($this->modnames as $modname => $text) {
+            if (count($elements)) {
+                $elements[] = $this->create_linebreak($mform);
+            }
             $elements[] = $mform->createElement('checkbox', $config_name.'['.$modname.']', '', $text);
         }
 
-        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), html_writer::empty_tag('br'), false);
+        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), '', false);
         $mform->addHelpButton($elements_name, $name, $plugin);
 
         $defaultvalue = $this->defaultvalue($name.$i);
@@ -684,10 +682,13 @@ class block_activity_list_edit_form extends block_edit_form {
 
         $elements = array();
         foreach ($specials as $special => $text) {
+            if (count($elements)) {
+                $elements[] = $this->create_linebreak($mform);
+            }
             $elements[] = $mform->createElement('checkbox', $config_name.'['.$special.']', '', $text);
         }
 
-        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), html_writer::empty_tag('br'), false);
+        $mform->addGroup($elements, $elements_name, get_string($name, $plugin), '', false);
         $mform->addHelpButton($elements_name, $name, $plugin);
 
         $defaultvalue = $this->defaultvalue($name.$i);
@@ -751,106 +752,15 @@ class block_activity_list_edit_form extends block_edit_form {
         }
     }
 
-    /**
-     * add_selectallnone
-     *
-     * @param object  $mform
-     * @param string  $plugin
-     * @return void, but will update $mform
-     */
-    protected function add_selectallnone($mform, $plugin) {
-        global $OUTPUT;
+    protected function create_linebreak($mform) {
+        // Most themes use flex layout, so the only way to force a newline
+        // is to insert a DIV that is fullwidth and minimal height.
+        $params = array('style' => 'width: 100%; height: 4px;');
+        $linebreak = html_writer::tag('div', '', $params);
+        return $mform->createElement('static', '', '', $linebreak);
+    }
 
-        $str = (object)array(
-            'all'        => addslashes_js(get_string('all')),
-            'apply'      => addslashes_js(get_string('apply', $plugin)),
-            'none'       => addslashes_js(get_string('none')),
-            'select'     => addslashes_js(get_string('selectallnone', $plugin)),
-            'selecthelp' => addslashes_js($OUTPUT->help_icon('selectallnone', $plugin))
-        );
-
-        $js = '';
-        $js .= '<script type="text/javascript">'."\n";
-        $js .= "//<![CDATA[\n";
-        $js .= "function add_selectallnone() {\n";
-        $js .= "    var obj = document.getElementsByTagName('DIV');\n";
-        $js .= "    if (obj) {\n";
-        $js .= "        var fbuttons = new RegExp('\\\\bfitem_actionbuttons\\\\b');\n";
-        $js .= "        var fcontainer = new RegExp('\\\\bfcontainer\\\\b');\n";
-        $js .= "        var fempty = new RegExp('\\\\bfemptylabel\\\\b');\n";
-        $js .= "        var fitem = new RegExp('\\\\bfitem\\\\b');\n";
-        $js .= "        var fid = new RegExp('^f[a-z]+_id_(elements_)?(config_)?(.*)');\n";
-        $js .= "        var i_max = obj.length;\n";
-        $js .= "        var addSelect = true;\n";
-        $js .= "        for (var i=0; i<i_max; i++) {\n";
-        $js .= "            if (obj[i].className.match(fbuttons)) {\n";
-        $js .= "                continue;\n";
-        $js .= "            }\n";
-        $js .= "            if (obj[i].className.match(fempty)) {\n";
-        $js .= "                continue;\n";
-        $js .= "            }\n";
-        $js .= "            if (obj[i].className.match(fitem)) {\n";
-
-        $js .= "                if (addSelect && obj[i].id=='') {\n";
-        $js .= "                    addSelect = false;\n";
-
-        $js .= "                    var elm = document.createElement('SPAN');\n";
-        $js .= "                    elm.style.margin = '6px auto';\n";
-
-        $js .= "                    var elm = document.createElement('SPAN');\n";
-        $js .= "                    elm.style.margin = '6px auto';\n";
-
-        $js .= "                    elm.appendChild(document.createTextNode('$str->select'));\n";
-        $js .= "                    elm.innerHTML += '$str->selecthelp';\n";
-        $js .= "                    elm.appendChild(document.createElement('BR'));\n";
-
-        $js .= "                    var lnk = document.createElement('A');\n";
-        $js .= "                    lnk.appendChild(document.createTextNode('$str->all'));\n";
-        $js .= "                    lnk.href = \"javascript:select_all_in('DIV','itemselect',null);\";\n";
-        $js .= "                    elm.appendChild(lnk);\n";
-
-        $js .= "                    elm.appendChild(document.createTextNode(' / '));\n";
-
-        $js .= "                    var lnk = document.createElement('A');\n";
-        $js .= "                    lnk.appendChild(document.createTextNode('$str->none'));\n";
-        $js .= "                    lnk.href = \"javascript:deselect_all_in('DIV','itemselect',null);\";\n";
-        $js .= "                    elm.appendChild(lnk);\n";
-
-        $js .= "                } else {\n";
-        $js .= "                    var elm = document.createElement('INPUT');\n";
-        $js .= "                    elm.style.margin = '6px auto';\n";
-
-        $js .= "                    if (obj[i].id=='fitem_id_config_mycourses') {\n";
-        $js .= "                        elm.type = 'submit';\n";
-        $js .= "                        elm.value = '$str->apply';\n";
-        $js .= "                    } else {\n";
-        $js .= "                        elm.type = 'checkbox';\n";
-        $js .= "                        elm.value = 1;\n";
-        $js .= "                        elm.name = 'select_' + obj[i].id.replace(fid, '\$3');\n";
-        $js .= "                        elm.id = 'id_select_' + obj[i].id.replace(fid, '\$3');\n";
-        $js .= "                    }\n";
-        $js .= "                }\n";
-
-        $js .= "                var div = document.createElement('DIV');\n";
-        $js .= "                div.appendChild(elm);\n";
-        $js .= "                div.className = 'itemselect';\n";
-        $js .= "                div.style.marginRight = (obj[i].offsetWidth - 720) + 'px';\n";
-
-        $js .= "                obj[i].insertBefore(div, obj[i].firstChild);\n";
-        $js .= "                div.style.height = obj[i].offsetHeight + 'px';\n";
-        $js .= "            }\n";
-        $js .= "        }\n";
-        $js .= "    }\n";
-        $js .= "}\n";
-        $js .= "if (window.addEventListener) {\n";
-        $js .= "    window.addEventListener('load', add_selectallnone, false);\n";
-        $js .= "} else if (window.attachEvent) {\n";
-        $js .= "    window.attachEvent('onload', add_selectallnone);\n";
-        $js .= "} else {\n";
-        $js .= "    window.onload = add_selectallnone;\n";
-        $js .= "}\n";
-        $js .= "//]]>\n";
-        $js .= "</script>\n";
-        $mform->addElement('static', '', '', $js);
+    protected function create_spacer($mform) {
+        return $mform->createElement('static', '', '', ' &nbsp; ');
     }
 }
