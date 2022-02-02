@@ -17,5 +17,5 @@
 $plugin->component = 'block_activity_list';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->requires  = 2010112400; // Moodle 2.0
-$plugin->version   = 2021092117;
-$plugin->release   = '2021-09-21 (17)';
+$plugin->version   = 2022020218;
+$plugin->release   = '2022-02-02 (18)';
