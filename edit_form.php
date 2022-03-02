@@ -104,10 +104,12 @@ class block_activity_list_edit_form extends block_edit_form {
                 $mform->setType($config_name, PARAM_INT);
                 $mform->setDefault($config_name, $this->defaultvalue($name));
                 $mform->addHelpButton($config_name, $name, $plugin);
-
-                $PAGE->requires->js_call_amd('block_activity_list/form', 'init');
             }
         }
+
+        // Insert the javascript to adjust layout of form elements
+        // and add "itemselect" checkboxes if necessary.
+        $PAGE->requires->js_call_amd('block_activity_list/form', 'init');
     }
 
     /**

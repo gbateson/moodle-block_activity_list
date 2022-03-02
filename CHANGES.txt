@@ -2,6 +2,9 @@
 Change log for block_activity_list
 ========================================
 
+2022-03-02 (20)
+ - add zerbra stripes on settings regardlesss of whether not the 'mycourses' element is present
+
 2022-03-01 (19)
  - add zebra stripes to the settings page if 'itemslect' checkboxes are used
 
