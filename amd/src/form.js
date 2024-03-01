@@ -50,7 +50,21 @@ define(["core/str"], function(STR) {
             JS.str.exportsettings = s[i++];
             JS.str.importsettings = s[i++];
 
-            var fieldsets = "#id_title, fieldset[id^=id_list], #id_applyselectedvalues";
+            // Check for obfuscated element IDs in blocks in Moodle >= 4.2
+            // e.g. id_title_m4YI21OUPqnjI5P
+            JS.obfuscation = new RegExp("_[^_]{15}$");
+            JS.use_obfuscation = document.querySelector("fieldset").id.match(JS.obfuscation);
+
+            var fieldsets = "";
+            if (JS.use_obfuscation) {
+                fieldsets = "[id^=id_title_],"
+                          + "fieldset[id^=id_list],"
+                          + "[id^=id_applyselectedvalues_]";
+            } else {
+                fieldsets = "#id_title,"
+                          + "fieldset[id^=id_list],"
+                          + "#id_applyselectedvalues";
+            }
             JS.add_itemselect_checkboxes(fieldsets);
         });
     };
@@ -82,9 +96,13 @@ define(["core/str"], function(STR) {
 
         var node = null;
 
-        // get name of parent element e.g. "fitem_id_description"
-        // and remove everything up to final underscore "_".
+        // Extract name of parent element from its id e.g. "fitem_id_description"
         var name = elm.parentNode.id;
+        if (JS.use_obfuscation) {
+            // Remove obfuscation chars from the end of the id.
+            name = name.replace(JS.obfuscation, "");
+        }
+        // Remove everything up to, and including,the final underscore "_".
         name = name.replace(new RegExp("^.+_"), "");
 
         if (name == "description") {

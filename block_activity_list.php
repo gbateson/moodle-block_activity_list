@@ -44,7 +44,7 @@ class block_activity_list extends block_base {
      */
     function init() {
         $this->title = get_string('blockname', 'block_activity_list');
-        $this->version = 2012040103;
+        // $this->version = 2012040103;
     }
 
     /**
